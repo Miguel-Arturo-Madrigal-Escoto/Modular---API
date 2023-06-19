@@ -1,0 +1,6 @@
+python-dotenv
+django
+djangorestframework
+djoser
+djangorestframework_simplejwt
+social-auth-app-django
