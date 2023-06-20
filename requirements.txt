@@ -4,3 +4,5 @@ djangorestframework
 djoser
 djangorestframework_simplejwt
 social-auth-app-django
+django-cors-headers
+psycopg2

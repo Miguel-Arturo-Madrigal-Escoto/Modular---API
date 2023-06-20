@@ -28,7 +28,11 @@ class User(AbstractBaseUser):
     google_id = models.CharField(max_length=255, null=True)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name='user')
     
+    # django required fields
+    is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'name', 'lastname', 'password']
+    REQUIRED_FIELDS = ['username', 'name', 'lastname', 'password', 'profile']

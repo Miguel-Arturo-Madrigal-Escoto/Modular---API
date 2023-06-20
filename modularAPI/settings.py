@@ -63,7 +63,9 @@ DJOSER = {
     'ACTIVATION_URL': '#/activate/{uid}/{token}', # frontend url (should make a post request)
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {
-        'user_create': 'authentication.serializers.MyUserCreateSerializer'
+        'user_create': 'authentication.serializers.MyUserCreateSerializer',
+        'user': 'authentication.serializers.MyCurrentUserSerializer',
+        'current_user': 'authentication.serializers.MyCurrentUserSerializer',
     }
 }
 
