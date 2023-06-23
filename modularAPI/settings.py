@@ -53,7 +53,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-AUTH_USER_MODEL = 'authentication.User'
+AUTH_USER_MODEL = 'authentication.BaseUser'
 
 SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('JWT',),
@@ -63,9 +63,9 @@ DJOSER = {
     'ACTIVATION_URL': '#/activate/{uid}/{token}', # frontend url (should make a post request)
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {
-        'user_create': 'authentication.serializers.MyUserCreateSerializer',
-        'user': 'authentication.serializers.MyCurrentUserSerializer',
-        'current_user': 'authentication.serializers.MyCurrentUserSerializer',
+        'user_create': 'authentication.serializers.MyBaseUserCreateSerializer',
+        'user': 'authentication.serializers.MyBaseCurrentUserSerializer',
+        'current_user': 'authentication.serializers.MyBaseCurrentUserSerializer',
     },
     'HIDE_USERS': True
 }

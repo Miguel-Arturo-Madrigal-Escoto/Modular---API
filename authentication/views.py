@@ -1,11 +1,16 @@
 from rest_framework import viewsets
-from .models import Profile
-from .serializers import ProfileSerializer
+from .models import User, Company
+from .serializers import UserSerializer, CompanySerializer
 from rest_framework.permissions import IsAuthenticated
-from .permissions import ProfilePermissions
+from .permissions import UserPermissions, CompanyPermissions
 
 # Create your views here.
-class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-    permission_classes = (ProfilePermissions,)
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (UserPermissions,)
+
+class CompanyViewSet(viewsets.ModelViewSet):
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
+    permission_classes = (CompanyPermissions,)

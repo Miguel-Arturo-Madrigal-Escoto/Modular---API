@@ -1,22 +1,29 @@
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
-from .models import User, Profile
+from .models import BaseUser, User, Company
 
-class ProfileSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
+        model = User
         fields = '__all__'
 
-class MyUserCreateSerializer(UserCreateSerializer):
-    profile = ProfileSerializer(read_only=True)
-    class Meta(UserCreateSerializer.Meta):
-        model = User
-        fields = ['username', 'email', 'password', 'name', 'lastname', 'profile']
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = '__all__'
 
-class MyCurrentUserSerializer(UserCreateSerializer):
-    profile = ProfileSerializer(read_only=True)
+class MyBaseUserCreateSerializer(UserCreateSerializer):
+    user = UserSerializer(read_only=True)
+    company = CompanySerializer(read_only=True)
     class Meta(UserCreateSerializer.Meta):
-        model = User
-        fields = ['id', 'username', 'email', 'name', 'lastname', 'profile']
+        model = BaseUser
+        fields = ['username', 'email', 'password', 'user', 'company']
+
+class MyBaseCurrentUserSerializer(UserCreateSerializer):
+    user = UserSerializer(read_only=True)
+    company = CompanySerializer(read_only=True)
+    class Meta(UserCreateSerializer.Meta):
+        model = BaseUser
+        fields = ['id', 'username', 'email', 'name', 'lastname', 'user', 'company']
 
 
