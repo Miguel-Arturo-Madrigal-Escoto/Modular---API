@@ -71,6 +71,7 @@ DJOSER = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -105,22 +106,22 @@ WSGI_APPLICATION = 'modularAPI.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # Default SQLite DB
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'PORT': os.environ.get('DB_PORT'),
-        'HOST': os.environ.get('DB_HOST'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD'),
+#         'PORT': os.environ.get('DB_PORT'),
+#         'HOST': os.environ.get('DB_HOST'),
+#     }
+# }
 
 
 # Password validation
@@ -175,3 +176,6 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT')
 # SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
 # SOCIAL_AUTH_ALLOWED_REDIRECT_URIS = 'http://localhost:8000'
+
+ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
