@@ -1,6 +1,8 @@
-from rest_framework.request import Request
-import requests
 import os
+
+import requests
+from rest_framework.request import Request
+
 
 class OAuth2:
     def __init__(self, provider: str, request: Request) -> None:
@@ -22,7 +24,7 @@ class OAuth2:
         }
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': f'sessionid={ session_id }'
+            'Cookie': f'sessionid={ session_id }',
         }
         api_response = requests.post(self.oauth_url, params=params, headers=headers)
 
