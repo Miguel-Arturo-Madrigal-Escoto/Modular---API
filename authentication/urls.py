@@ -12,6 +12,5 @@ urlpatterns = router.urls
 # authentication and jwt routes
 urlpatterns += [
     path('', include('djoser.urls')),
-    path('', include('djoser.urls.jwt')),
-    path('', include('djoser.social.urls'))
+    path('', include('djoser.urls.jwt'))
 ]
