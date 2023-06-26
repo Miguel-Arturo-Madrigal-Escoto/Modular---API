@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'djoser',
+    'social_django',
     'authentication'
 ]
 
@@ -67,15 +68,20 @@ DJOSER = {
         'user': 'authentication.serializers.MyBaseCurrentUserSerializer',
         'current_user': 'authentication.serializers.MyBaseCurrentUserSerializer',
     },
-    'HIDE_USERS': True
+    'HIDE_USERS': True,
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': [
+        os.environ.get('SOCIAL_AUTH_GOOGLE_ALLOWED_REDIRECT_URI', '')
+    ]
 }
 
 AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,6 +104,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -178,6 +186,7 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT')
 # OAuth Providers
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 # CORS Configuration
 ALLOWED_HOSTS = ['*']
