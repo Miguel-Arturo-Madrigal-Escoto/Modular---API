@@ -1,9 +1,10 @@
-python-dotenv
 django
-djangorestframework
-djoser
-djangorestframework_simplejwt
-social-auth-app-django
 django-cors-headers
+djangorestframework
+djangorestframework_simplejwt
+djoser
+pre-commit
 psycopg2
+python-dotenv
 requests
+social-auth-app-django

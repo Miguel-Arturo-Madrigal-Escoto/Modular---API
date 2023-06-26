@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
@@ -45,7 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'social_django',
-    'authentication'
+    'authentication',
 ]
 
 REST_FRAMEWORK = {
@@ -57,11 +58,11 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'authentication.BaseUser'
 
 SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
+    'AUTH_HEADER_TYPES': ('JWT',),
 }
 
 DJOSER = {
-    'ACTIVATION_URL': '#/activate/{uid}/{token}', # frontend url (should make a post request)
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',  # frontend url (should make a post request)
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {
         'user_create': 'authentication.serializers.MyBaseUserCreateSerializer',
@@ -71,7 +72,7 @@ DJOSER = {
     'HIDE_USERS': True,
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': [
         os.environ.get('SOCIAL_AUTH_GOOGLE_ALLOWED_REDIRECT_URI', '')
-    ]
+    ],
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -191,4 +192,3 @@ SOCIAL_AUTH_JSONFIELD_ENABLED = True
 # CORS Configuration
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
-
