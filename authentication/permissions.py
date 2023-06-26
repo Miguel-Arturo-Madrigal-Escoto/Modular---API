@@ -1,8 +1,7 @@
 from rest_framework.permissions import BasePermission
 from .models import BaseUser
 
-class UserPermissions(BasePermission):
-    
+class UserPermissions(BasePermission): 
     def has_permission(self, request, view):
         return super().has_permission(request, view)
        
@@ -17,7 +16,6 @@ class UserPermissions(BasePermission):
         
 
 class CompanyPermissions(BasePermission):
-
     def has_permission(self, request, view):
         return super().has_permission(request, view)
     
