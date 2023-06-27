@@ -1,19 +1,35 @@
 import os
 
 import requests
+from django.contrib.sessions.models import Session
+from django.forms.models import model_to_dict
 from rest_framework.request import Request
 
 
 class OAuth2:
     def __init__(self, provider: str, request: Request) -> None:
-        self.oauth_urls = {
-            'google': os.environ.get('SOCIAL_AUTH_GOOGLE_AUTHENTICATE_URI')
+        self.oauth = {
+            'google': {
+                'authenticate_uri': os.environ.get('SOCIAL_AUTH_GOOGLE_AUTHENTICATE_URI', ''),
+                'db_field': os.environ.get('SOCIAL_AUTH_GOOGLE_STATE_DB_FIELD', '')
+            }
         }
-        self.oauth_url = self.oauth_urls.get(provider, '')
+        self.oauth_url = self.oauth.get(provider, '')['authenticate_uri']
+        self.db_field = self.oauth.get(provider, '')['db_field']
         self.request = request
 
     def authenticate(self):
-        session_id = self.request.COOKIES.get('sessionid')
+        sessions = Session.objects.all()
+        session_keys = {}
+
+        for session in sessions:
+            # match the session with the incoming state query param and the
+            # session (cookie) decoded data from the database
+            session_keys[
+                session.get_decoded().get(self.db_field, '')
+            ] = model_to_dict(session)['session_key']
+
+        session_id = session_keys[self.request.query_params.get('state', '')]
 
         params = {
             'state': self.request.query_params.get('state', ''),

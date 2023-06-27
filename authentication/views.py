@@ -29,4 +29,6 @@ class GoogleOAuth2(APIView):
             oauth_response = oauth2.authenticate()
             return Response(oauth_response, status=status.HTTP_200_OK)
         except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'detail': 'username and/or email already exists'
+            }, status=status.HTTP_400_BAD_REQUEST)
