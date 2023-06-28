@@ -62,7 +62,7 @@ SIMPLE_JWT = {
 }
 
 DJOSER = {
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',  # frontend url (should make a post request)
+    'ACTIVATION_URL': 'register/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {
         'user_create': 'authentication.serializers.MyBaseUserCreateSerializer',
@@ -73,7 +73,13 @@ DJOSER = {
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': [
         os.environ.get('SOCIAL_AUTH_GOOGLE_ALLOWED_REDIRECT_URI', '')
     ],
+    'EMAIL': {
+        'activation': 'authentication.email.ActivationEmail'
+    }
 }
+
+DOMAIN = os.environ.get('DOMAIN', '')
+SITE_NAME = os.environ.get('SITE_NAME', '')
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
