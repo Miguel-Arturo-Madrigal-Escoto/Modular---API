@@ -12,6 +12,10 @@ class OAuth2:
             'google': {
                 'authenticate_uri': os.environ.get('SOCIAL_AUTH_GOOGLE_AUTHENTICATE_URI', ''),
                 'db_field': os.environ.get('SOCIAL_AUTH_GOOGLE_STATE_DB_FIELD', '')
+            },
+            'linkedin': {
+                'authenticate_uri': os.environ.get('SOCIAL_AUTH_LINKEDIN_AUTHENTICATE_URI', ''),
+                'db_field': os.environ.get('SOCIAL_AUTH_LINKEDIN_STATE_DB_FIELD', '')
             }
         }
         self.oauth_url = self.oauth.get(provider, '')['authenticate_uri']
@@ -36,12 +40,11 @@ class OAuth2:
             'code': self.request.query_params.get('code', ''),
             'scope': self.request.query_params.get('scope', ''),
             'authuser': self.request.query_params.get('authuser', ''),
-            'prompt': self.request.query_params.get('prompt', ''),
+            'prompt': self.request.query_params.get('prompt', '')
         }
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': f'sessionid={ session_id }',
+            'Cookie': f'sessionid={ session_id }'
         }
         api_response = requests.post(self.oauth_url, params=params, headers=headers)
-
         return api_response.json()
