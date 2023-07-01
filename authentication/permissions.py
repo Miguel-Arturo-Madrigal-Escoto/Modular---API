@@ -10,7 +10,7 @@ class UserPermissions(BasePermission):
         Check if authenticted user has 'user' (not company) role and match both ids.
         """
         try:
-            return not request.user.user and request.user.id == obj.base_user.id
+            return request.user.user and request.user.id == obj.base_user.id
         except Exception:
             return False
 
