@@ -72,7 +72,8 @@ DJOSER = {
     'HIDE_USERS': True,
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': [
         os.environ.get('SOCIAL_AUTH_GOOGLE_ALLOWED_REDIRECT_URI', ''),
-        os.environ.get('SOCIAL_AUTH_LINKEDIN_ALLOWED_REDIRECT_URI', '')
+        os.environ.get('SOCIAL_AUTH_LINKEDIN_ALLOWED_REDIRECT_URI', ''),
+        os.environ.get('SOCIAL_AUTH_GITHUB_ALLOWED_REDIRECT_URI', '')
     ],
     'EMAIL': {
         'activation': 'authentication.email.ActivationEmail'
@@ -82,7 +83,9 @@ DJOSER = {
 DOMAIN = os.environ.get('DOMAIN', '')
 SITE_NAME = os.environ.get('SITE_NAME', '')
 
+
 AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
     'social_core.backends.google.GoogleOAuth2',
     'social_core.backends.linkedin.LinkedinOAuth2',
     'django.contrib.auth.backends.ModelBackend',
@@ -200,6 +203,9 @@ SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY')
 SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET')
 
+SOCIAL_AUTH_GITHUB_KEY = os.environ.get('SOCIAL_AUTH_GITHUB_OAUTH2_KEY', '')
+SOCIAL_AUTH_GITHUB_SECRET = os.environ.get('SOCIAL_AUTH_GITHUB_OAUTH2_SECRET', '')
+SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 

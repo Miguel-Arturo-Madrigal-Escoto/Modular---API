@@ -1,7 +1,8 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import CompanyViewSet, GoogleOAuth2, LinkedinOAuth2, UserViewSet
+from .views import (CompanyViewSet, GithubOAuth2, GoogleOAuth2, LinkedinOAuth2,
+                    UserViewSet)
 
 router = DefaultRouter()
 router.register('user', UserViewSet)
@@ -18,4 +19,5 @@ urlpatterns += [
     path('', include('social_django.urls')),
     path('oauth2/google/', GoogleOAuth2.as_view()),
     path('oauth2/linkedin/', LinkedinOAuth2.as_view()),
+    path('oauth2/github/', GithubOAuth2.as_view()),
 ]

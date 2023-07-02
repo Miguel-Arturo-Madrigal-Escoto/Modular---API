@@ -16,7 +16,11 @@ class OAuth2:
             'linkedin': {
                 'authenticate_uri': os.environ.get('SOCIAL_AUTH_LINKEDIN_AUTHENTICATE_URI', ''),
                 'db_field': os.environ.get('SOCIAL_AUTH_LINKEDIN_STATE_DB_FIELD', '')
-            }
+            },
+            'github': {
+                'authenticate_uri': os.environ.get('SOCIAL_AUTH_GITHUB_AUTHENTICATE_URI', ''),
+                'db_field': os.environ.get('SOCIAL_AUTH_GITHUB_STATE_DB_FIELD', '')
+            },
         }
         self.oauth_url = self.oauth.get(provider, '')['authenticate_uri']
         self.db_field = self.oauth.get(provider, '')['db_field']
@@ -34,7 +38,6 @@ class OAuth2:
             ] = model_to_dict(session)['session_key']
 
         session_id = session_keys[self.request.query_params.get('state', '')]
-
         params = {
             'state': self.request.query_params.get('state', ''),
             'code': self.request.query_params.get('code', ''),
@@ -47,4 +50,5 @@ class OAuth2:
             'Cookie': f'sessionid={ session_id }'
         }
         api_response = requests.post(self.oauth_url, params=params, headers=headers)
+
         return api_response.json()

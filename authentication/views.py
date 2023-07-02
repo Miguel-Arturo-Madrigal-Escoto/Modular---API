@@ -43,3 +43,15 @@ class LinkedinOAuth2(APIView):
             return Response({
                 'detail': 'username and/or email already taken.'
             }, status=status.HTTP_400_BAD_REQUEST)
+
+class GithubOAuth2(APIView):
+    def get(self, request: Request):
+        oauth2 = OAuth2(provider='github', request=request)
+
+        try:
+            oauth_response = oauth2.authenticate()
+            return Response(oauth_response, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({
+                'detail': 'username and/or email already taken.'
+            }, status=status.HTTP_400_BAD_REQUEST)
