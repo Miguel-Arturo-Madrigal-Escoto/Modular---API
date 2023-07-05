@@ -22,7 +22,8 @@ class OAuth2:
                 'db_field': os.environ.get('SOCIAL_AUTH_GITHUB_STATE_DB_FIELD', '')
             },
         }
-        self.oauth_url = self.oauth.get(provider, '')['authenticate_uri']
+        self.authenticate_uri = self.oauth.get(provider, '')['authenticate_uri']
+        self.oauth_url = request._current_scheme_host + self.authenticate_uri
         self.db_field = self.oauth.get(provider, '')['db_field']
         self.request = request
 

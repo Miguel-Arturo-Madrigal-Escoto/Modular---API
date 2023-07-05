@@ -47,7 +47,6 @@ class LinkedinOAuth2(APIView):
 class GithubOAuth2(APIView):
     def get(self, request: Request):
         oauth2 = OAuth2(provider='github', request=request)
-
         try:
             oauth_response = oauth2.authenticate()
             return Response(oauth_response, status=status.HTTP_200_OK)
