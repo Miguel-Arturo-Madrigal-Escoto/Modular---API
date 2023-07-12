@@ -1,4 +1,5 @@
 from djoser.serializers import UserCreateSerializer
+from djoser.serializers import UserSerializer as USerializer
 from rest_framework import serializers
 
 from .models import BaseUser, Company, User
@@ -22,13 +23,13 @@ class MyBaseUserCreateSerializer(UserCreateSerializer):
 
     class Meta(UserCreateSerializer.Meta):
         model = BaseUser
-        fields = ['username', 'email', 'password', 'user', 'company']
+        fields = ['id', 'username', 'email', 'password', 'user', 'company']
 
 
-class MyBaseCurrentUserSerializer(UserCreateSerializer):
+class MyBaseCurrentUserSerializer(USerializer):
     user = UserSerializer(read_only=True)
     company = CompanySerializer(read_only=True)
 
     class Meta(UserCreateSerializer.Meta):
         model = BaseUser
-        fields = ['id', 'username', 'email', 'name', 'lastname', 'user', 'company']
+        fields = ['id', 'username', 'email', 'user', 'company']
