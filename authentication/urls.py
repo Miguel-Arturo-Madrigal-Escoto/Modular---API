@@ -19,5 +19,5 @@ urlpatterns += [
     path('', include('social_django.urls')),
     path('oauth2/google/', GoogleOAuth2.as_view()),
     path('oauth2/linkedin/', LinkedinOAuth2.as_view()),
-    path('oauth2/github/', GithubOAuth2.as_view()),
+    path('oauth2/github/', GithubOAuth2.as_view())
 ]
