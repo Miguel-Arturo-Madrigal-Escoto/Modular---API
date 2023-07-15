@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'social_django',
+    'health',
     'authentication',
 ]
 
@@ -94,6 +95,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE = [
+    'health.middleware.HealthCheckMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'django.middleware.security.SecurityMiddleware',
