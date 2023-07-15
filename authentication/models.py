@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractBaseUser
+from django.core.validators import (MaxLengthValidator, MinLengthValidator,
+                                    MinValueValidator)
 from django.db import models
 
+from .constants import MODALITY_CHOICES
 from .managers import CustomUserManager
 
 
@@ -23,22 +26,40 @@ class BaseUser(AbstractBaseUser):
 
 
 class User(models.Model):
-    name = models.CharField(max_length=50)
-    lastname = models.CharField(max_length=50)
-    position = models.CharField(max_length=50)
-    expected_salary = models.FloatField()
-    modality = models.CharField(max_length=10)
-    location = models.CharField(max_length=50)
-    image = models.TextField(null=True)
+    name = models.CharField(max_length=50, validators=[
+        MinLengthValidator(3),
+        MaxLengthValidator(50),
+    ])
+    lastname = models.CharField(max_length=50, validators=[
+        MinLengthValidator(3),
+        MaxLengthValidator(50),
+    ])
+    position = models.CharField(max_length=50, validators=[
+        MinLengthValidator(3),
+        MaxLengthValidator(50),
+    ])
+    expected_salary = models.FloatField(validators=[
+        MinValueValidator(0)
+    ])
+    modality = models.CharField(max_length=10, choices=MODALITY_CHOICES)
+    location = models.CharField(max_length=50, validators=[
+        MinLengthValidator(3),
+        MaxLengthValidator(50),
+    ])
+    image = models.ImageField(upload_to='images/user', null=True)
     base_user = models.OneToOneField(
         BaseUser, on_delete=models.CASCADE, related_name='user'
     )
 
 
 class Company(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, validators=[
+        MinLengthValidator(3),
+        MaxLengthValidator(50),
+    ])
     about = models.TextField()
     verified = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='images/company', null=True)
     base_user = models.OneToOneField(
         BaseUser, on_delete=models.CASCADE, related_name='company'
     )
