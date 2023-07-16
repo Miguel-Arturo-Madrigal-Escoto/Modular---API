@@ -19,6 +19,9 @@ class BaseUser(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
@@ -46,6 +49,9 @@ class User(models.Model):
         MinLengthValidator(3),
         MaxLengthValidator(50),
     ])
+    about = models.TextField(validators=[
+        MinLengthValidator(20)
+    ])
     image = models.ImageField(upload_to='images/user', null=True)
     base_user = models.OneToOneField(
         BaseUser, on_delete=models.CASCADE, related_name='user'
@@ -57,7 +63,9 @@ class Company(models.Model):
         MinLengthValidator(3),
         MaxLengthValidator(50),
     ])
-    about = models.TextField()
+    about = models.TextField(validators=[
+        MinLengthValidator(20)
+    ])
     verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/company', null=True)
     base_user = models.OneToOneField(

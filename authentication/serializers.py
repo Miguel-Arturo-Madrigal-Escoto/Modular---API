@@ -32,4 +32,4 @@ class MyBaseCurrentUserSerializer(USerializer):
 
     class Meta(UserCreateSerializer.Meta):
         model = BaseUser
-        fields = ['id', 'username', 'email', 'user', 'company']
+        fields = ['id', 'username', 'email', 'user', 'company', 'created_at', 'updated_at']
