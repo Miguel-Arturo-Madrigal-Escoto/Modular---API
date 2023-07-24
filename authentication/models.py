@@ -3,7 +3,8 @@ from django.core.validators import (MaxLengthValidator, MinLengthValidator,
                                     MinValueValidator)
 from django.db import models
 
-from .constants import MODALITY_CHOICES
+from .constants import (LOCATION_CHOICES, MODALITY_CHOICES, POSITION_CHOICES,
+                        SECTOR_CHOICES)
 from .managers import CustomUserManager
 
 
@@ -37,18 +38,12 @@ class User(models.Model):
         MinLengthValidator(3),
         MaxLengthValidator(50),
     ])
-    position = models.CharField(max_length=50, validators=[
-        MinLengthValidator(3),
-        MaxLengthValidator(50),
-    ])
+    position = models.CharField(max_length=50, choices=POSITION_CHOICES)
     expected_salary = models.FloatField(validators=[
         MinValueValidator(0)
     ])
     modality = models.CharField(max_length=10, choices=MODALITY_CHOICES)
-    location = models.CharField(max_length=50, validators=[
-        MinLengthValidator(3),
-        MaxLengthValidator(50),
-    ])
+    location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
     about = models.TextField(validators=[
         MinLengthValidator(20)
     ])
@@ -66,7 +61,15 @@ class Company(models.Model):
     about = models.TextField(validators=[
         MinLengthValidator(20)
     ])
+    mission = models.TextField(validators=[
+        MinLengthValidator(20)
+    ])
+    vision = models.TextField(validators=[
+        MinLengthValidator(20)
+    ])
     verified = models.BooleanField(default=False)
+    location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
+    sector = models.CharField(max_length=50, choices=SECTOR_CHOICES)
     image = models.ImageField(upload_to='images/company', null=True)
     base_user = models.OneToOneField(
         BaseUser, on_delete=models.CASCADE, related_name='company'
