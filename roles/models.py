@@ -10,6 +10,10 @@ class Role(models.Model):
 
 
 class CompanyRoles(models.Model):
+    name = models.CharField(max_length=40)
     description = models.TextField()
+    link = models.TextField()
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
