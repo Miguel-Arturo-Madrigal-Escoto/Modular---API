@@ -1,0 +1,134 @@
+[
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "administrador"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "analista de datos"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "arquitecto"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "auxiliar"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "becario"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "cocinero"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "contador"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "desarrollador"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "devops"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "diseñador"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "electricista"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "enfermero"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "fisico"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "ingeniero"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "matematico"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "medico"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "mesero"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "musico"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "profesor"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "tester"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "vendedor"
+        }
+    },
+    {
+        "model": "roles.role",
+        "fields": {
+            "position": "otro"
+        }
+    }
+]
