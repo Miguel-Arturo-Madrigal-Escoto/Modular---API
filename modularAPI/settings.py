@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'health',
     'roles',
     'authentication',
+    'form'
 ]
 
 REST_FRAMEWORK = {
