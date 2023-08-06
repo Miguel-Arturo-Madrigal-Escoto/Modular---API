@@ -21,6 +21,7 @@ from django.urls import include, path
 urlpatterns = [
     path('auth/', include('authentication.urls')),
     path('form/', include('form.urls')),
+    path('', include('experience.urls')),
     path('', include('roles.urls'))
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

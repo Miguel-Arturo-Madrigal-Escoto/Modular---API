@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.permissions import IsAuthenticated
 
 from .models import CompanyRoles, Role
 from .serializers import CompanyRolesSerializer, RoleSerializer
@@ -21,6 +22,7 @@ class CompanyRolesViewSet(ModelViewSet):
     serializer_class = CompanyRolesSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = '__all__'
+    #permission_classes = [IsAuthenticated]
 
     @action(methods=['POST'], detail=False)
     def add_roles(self, request: Request):
