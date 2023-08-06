@@ -2,7 +2,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-
 from authentication.constants import (LOCATION_CHOICES, MODALITY_CHOICES,
                                       POSITION_CHOICES, SECTOR_CHOICES)
 

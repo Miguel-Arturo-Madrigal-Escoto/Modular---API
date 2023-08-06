@@ -1,7 +1,9 @@
-from django.db import models
-from authentication.models import User
 from django.core.validators import MinLengthValidator
+from django.db import models
+
+from authentication.models import User
 from roles.models import Role
+
 
 # Create your models here.
 class Experience(models.Model):
@@ -11,4 +13,4 @@ class Experience(models.Model):
         MinLengthValidator(20)
     ])
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    user =  models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
