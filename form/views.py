@@ -24,9 +24,10 @@ class FormViewSet(ViewSet):
 
     def parse_constant(self, constant):
         form_data = []
-        for value in constant:
+        for idx, value in enumerate(constant):
             form_data.append({
                 'value': value[0],
-                'display': value[1]
+                'display': value[1],
+                'id': idx + 1
             })
         return form_data

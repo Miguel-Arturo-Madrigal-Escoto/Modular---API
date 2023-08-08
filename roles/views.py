@@ -21,6 +21,7 @@ class CompanyRolesViewSet(ModelViewSet):
     serializer_class = CompanyRolesSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = '__all__'
+    # permission_classes = [IsAuthenticated]
 
     @action(methods=['POST'], detail=False)
     def add_roles(self, request: Request):

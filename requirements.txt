@@ -6,7 +6,7 @@ djangorestframework_simplejwt
 djoser
 Pillow
 pre-commit
-psycopg2
+psycopg2-binary
 python-dotenv
 requests
 social-auth-app-django

@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'health',
     'roles',
     'authentication',
-    'form'
+    'form',
+    'experience'
 ]
 
 REST_FRAMEWORK = {
@@ -73,6 +74,9 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
 
+DOMAIN = os.environ.get('DOMAIN', '')
+UI_URL = os.environ.get('UI_URL', '')
+
 DJOSER = {
     'ACTIVATION_URL': 'register/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
@@ -83,16 +87,15 @@ DJOSER = {
     },
     'HIDE_USERS': True,
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': [
-        os.environ.get('SOCIAL_AUTH_GOOGLE_ALLOWED_REDIRECT_URI', ''),
-        os.environ.get('SOCIAL_AUTH_LINKEDIN_ALLOWED_REDIRECT_URI', ''),
-        os.environ.get('SOCIAL_AUTH_GITHUB_ALLOWED_REDIRECT_URI', '')
+        UI_URL + os.environ.get('SOCIAL_AUTH_GOOGLE_ALLOWED_REDIRECT_URI', ''),
+        UI_URL + os.environ.get('SOCIAL_AUTH_LINKEDIN_ALLOWED_REDIRECT_URI', ''),
+        UI_URL + os.environ.get('SOCIAL_AUTH_GITHUB_ALLOWED_REDIRECT_URI', '')
     ],
     'EMAIL': {
         'activation': 'authentication.email.ActivationEmail'
     }
 }
 
-DOMAIN = os.environ.get('DOMAIN', '')
 SITE_NAME = os.environ.get('SITE_NAME', '')
 
 
