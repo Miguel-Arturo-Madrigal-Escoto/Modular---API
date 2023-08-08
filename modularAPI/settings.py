@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'roles',
     'authentication',
     'form',
-    'experience'
+    'experience',
+    'skills'
 ]
 
 REST_FRAMEWORK = {
