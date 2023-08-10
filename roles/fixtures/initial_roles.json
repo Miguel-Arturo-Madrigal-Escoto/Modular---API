@@ -124,11 +124,5 @@
         "fields": {
             "position": "vendedor"
         }
-    },
-    {
-        "model": "roles.role",
-        "fields": {
-            "position": "otro"
-        }
     }
 ]

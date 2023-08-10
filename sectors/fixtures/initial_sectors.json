@@ -1,0 +1,62 @@
+[
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "educacion"
+        }
+    },
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "salud"
+        }
+    },
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "alimentos"
+        }
+    },
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "financiero"
+        }
+    },
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "software"
+        }
+    },
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "tecnologias de la informacion (ti)"
+        }
+    },
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "transporte"
+        }
+    },
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "turismo"
+        }
+    },
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "ventas"
+        }
+    },
+    {
+        "model": "sectors.sector",
+        "fields": {
+            "name": "telecomunicaciones"
+        }
+    }
+]

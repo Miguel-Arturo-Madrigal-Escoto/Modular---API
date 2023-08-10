@@ -1,7 +1,8 @@
-from django.core.validators import (MaxLengthValidator, MinLengthValidator)
+from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.db import models
 
 from authentication.models import User
+
 
 # Create your models here.
 class Skill(models.Model):

@@ -2,13 +2,15 @@ from django.core.validators import (MaxLengthValidator, MinLengthValidator,
                                     URLValidator)
 from django.db import models
 
-from authentication import constants
 from authentication.models import Company
 
 
 # Create your models here.
 class Role(models.Model):
-    position = models.CharField(max_length=50, choices=constants.POSITION_CHOICES)
+    position = models.CharField(max_length=50, unique=True, blank=False, validators=[
+        MinLengthValidator(5),
+        MaxLengthValidator(50)
+    ])
 
 
 class CompanyRoles(models.Model):

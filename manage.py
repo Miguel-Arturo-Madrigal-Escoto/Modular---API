@@ -20,6 +20,7 @@ def main():
     # Load fixtures into db
     if len(sys.argv) == 2 and sys.argv[1] == 'migrate':
         execute_from_command_line(['manage.py', 'loaddata', 'initial_roles.json'])
+        execute_from_command_line(['manage.py', 'loaddata', 'initial_sectors.json'])
 
 
 if __name__ == '__main__':

@@ -23,6 +23,7 @@ urlpatterns = [
     path('form/', include('form.urls')),
     path('', include('experience.urls')),
     path('', include('skills.urls')),
-    path('', include('roles.urls'))
+    path('', include('roles.urls')),
+    path('', include('sectors.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
