@@ -3,18 +3,31 @@ import ast
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from .models import CompanyRoles, Role
 from .serializers import CompanyRolesSerializer, RoleSerializer
 
 
 # Create your views here.
-class RolesViewSet(ReadOnlyModelViewSet):
+class RolesAPIView(ListCreateAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def list(self, request: Request):
+        try:
+            role = self.get_queryset().get(position=request.query_params.get('position'))
+            serializer = self.get_serializer(instance=role)
+            return Response(serializer.data)
+
+        except Role.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class CompanyRolesViewSet(ModelViewSet):
     queryset = CompanyRoles.objects.all()

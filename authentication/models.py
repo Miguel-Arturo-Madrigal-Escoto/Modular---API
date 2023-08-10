@@ -3,8 +3,7 @@ from django.core.validators import (MaxLengthValidator, MinLengthValidator,
                                     MinValueValidator)
 from django.db import models
 
-from .constants import (LOCATION_CHOICES, MODALITY_CHOICES, POSITION_CHOICES,
-                        SECTOR_CHOICES)
+from .constants import LOCATION_CHOICES, MODALITY_CHOICES
 from .managers import CustomUserManager
 
 
@@ -14,7 +13,6 @@ class BaseUser(AbstractBaseUser):
     email = models.EmailField(unique=True, max_length=255)
     # password provided automatically
     is_active = models.BooleanField(default=False)  # email verification
-    # google_id = models.CharField(max_length=255, null=True)
 
     # django required fields
     is_staff = models.BooleanField(default=False)
@@ -38,7 +36,7 @@ class User(models.Model):
         MinLengthValidator(3),
         MaxLengthValidator(50),
     ])
-    position = models.CharField(max_length=50, choices=POSITION_CHOICES)
+    position = models.ForeignKey('roles.Role', on_delete=models.CASCADE)
     expected_salary = models.FloatField(validators=[
         MinValueValidator(0)
     ])
@@ -69,7 +67,7 @@ class Company(models.Model):
     ])
     verified = models.BooleanField(default=False)
     location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
-    sector = models.CharField(max_length=50, choices=SECTOR_CHOICES)
+    sector = models.OneToOneField('sectors.Sector', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images/company', null=True)
     base_user = models.OneToOneField(
         BaseUser, on_delete=models.CASCADE, related_name='company'

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django_filters',
     'health',
     'roles',
+    'sectors',
     'authentication',
     'form',
     'experience',
