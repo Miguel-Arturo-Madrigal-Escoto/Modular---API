@@ -21,13 +21,14 @@ class MatchViewSet(ModelViewSet):
     def match_user(self, request: Request):
         user_id = request.user.user.id
         company_id = request.data.get('company_id', 0)
+        like = request.data.get('like', True)
 
         try:
             match_u = self.get_queryset().get(user_id=user_id, company_id=company_id)
-            match_u.user_like = True
+            match_u.user_like = like
             match_u.save()
         except Match.DoesNotExist:
-            match_u = Match(user_id=user_id, company_id=company_id, user_like=True)
+            match_u = Match(user_id=user_id, company_id=company_id, user_like=like)
             match_u.save()
 
         match_u = self.get_queryset().get(user_id=user_id, company_id=company_id)
@@ -42,13 +43,14 @@ class MatchViewSet(ModelViewSet):
     def match_company(self, request: Request):
         company_id = request.user.company.id
         user_id = request.data.get('user_id', 0)
+        like = request.data.get('like', True)
 
         try:
             match_c = self.get_queryset().get(user_id=user_id, company_id=company_id)
-            match_c.company_like = True
+            match_c.company_like = like
             match_c.save()
         except Match.DoesNotExist:
-            match_c = Match(user_id=user_id, company_id=company_id, company_like=True)
+            match_c = Match(user_id=user_id, company_id=company_id, company_like=like)
             match_c.save()
 
         match_c = self.get_queryset().get(user_id=user_id, company_id=company_id)
