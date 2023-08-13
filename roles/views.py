@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from .models import CompanyRoles, Role
+from .permissions import CompanyRolesPermissions
 from .serializers import CompanyRolesSerializer, RoleSerializer
 
 
@@ -34,7 +35,7 @@ class CompanyRolesViewSet(ModelViewSet):
     serializer_class = CompanyRolesSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = '__all__'
-    # permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated, CompanyRolesPermissions)
 
     @action(methods=['POST'], detail=False)
     def add_roles(self, request: Request):
@@ -48,7 +49,7 @@ class CompanyRolesViewSet(ModelViewSet):
                     name=role.get('name', ''),
                     description=role.get('description', ''),
                     link=role.get('link', ''),
-                    company_id=request.data.get('company_id', 0),
+                    company_id=request.user.company.id,
                     role_id=current_role.pk
                 )
                 company_role.save()
