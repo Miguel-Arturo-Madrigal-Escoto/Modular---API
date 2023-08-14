@@ -37,6 +37,14 @@ class CompanyRolesViewSet(ModelViewSet):
     filterset_fields = '__all__'
     permission_classes = (IsAuthenticated, CompanyRolesPermissions)
 
+    def list(self, request: Request):
+        try:
+            roles = self.get_queryset().filter(company=request.user.company.id)
+            serializer = self.get_serializer(instance=roles, many=True)
+            return Response(serializer.data)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
     @action(methods=['POST'], detail=False)
     def add_roles(self, request: Request):
         errors = {}
