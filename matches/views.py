@@ -5,6 +5,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from authentication.models import Company, User
+from authentication.serializers import CompanySerializer, UserSerializer
+
 from .models import Match
 from .serializers import MatchSerializer
 
@@ -21,7 +24,7 @@ class MatchViewSet(ModelViewSet):
     def match_user(self, request: Request):
         user_id = request.user.user.id
         company_id = request.data.get('company_id', 0)
-        like = request.data.get('like', True)
+        like = request.data.get('like', False)
 
         try:
             match_u = self.get_queryset().get(user_id=user_id, company_id=company_id)
@@ -32,10 +35,14 @@ class MatchViewSet(ModelViewSet):
             match_u.save()
 
         match_u = self.get_queryset().get(user_id=user_id, company_id=company_id)
+
+        base_user_user = User.objects.get(id=user_id)
+        base_user_company = Company.objects.get(id=company_id)
+
         response = {
             'match': True if match_u.user_like and match_u.company_like else False,
-            'user': user_id,
-            'company': company_id,
+            'user': base_user_user.base_user.id,
+            'company': base_user_company.base_user.id,
         }
         return Response(data=response)
 
@@ -54,9 +61,25 @@ class MatchViewSet(ModelViewSet):
             match_c.save()
 
         match_c = self.get_queryset().get(user_id=user_id, company_id=company_id)
+
+        base_user_user = User.objects.get(id=user_id)
+        base_user_company = Company.objects.get(id=company_id)
+
         response = {
             'match': True if match_c.user_like and match_c.company_like else False,
-            'user': user_id,
-            'company': company_id,
+            'user': base_user_user.base_user.id,
+            'company': base_user_company.base_user.id,
         }
         return Response(data=response)
+
+    @action(methods=['GET'], detail=False)
+    def get_user_match(self, request: Request):
+        company = Company.objects.order_by('?')[0]
+        company_serializer = CompanySerializer(instance=company)
+        return Response(company_serializer.data)
+
+    @action(methods=['GET'], detail=False)
+    def get_company_match(self, request: Request):
+        user = User.objects.order_by('?')[0]
+        user_serializer = UserSerializer(instance=user)
+        return Response(user_serializer.data)
