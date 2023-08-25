@@ -23,7 +23,8 @@ class CompanyViewSet(viewsets.ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     permission_classes = (CompanyPermissions,)
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['base_user']
 
 class GoogleOAuth2(APIView):
     def get(self, request: Request):
