@@ -67,7 +67,7 @@ class Company(models.Model):
     ])
     verified = models.BooleanField(default=False)
     location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
-    sector = models.OneToOneField('sectors.Sector', on_delete=models.CASCADE)
+    sector = models.ForeignKey('sectors.Sector', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images/company', null=True)
     base_user = models.OneToOneField(
         BaseUser, on_delete=models.CASCADE, related_name='company'

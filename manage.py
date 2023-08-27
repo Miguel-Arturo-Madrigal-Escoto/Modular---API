@@ -17,10 +17,22 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
-    # Load fixtures into db
+    # Load fixtures & factories into db
     if len(sys.argv) == 2 and sys.argv[1] == 'migrate':
         execute_from_command_line(['manage.py', 'loaddata', 'initial_roles.json'])
         execute_from_command_line(['manage.py', 'loaddata', 'initial_sectors.json'])
+
+        from authentication.factory import CompanyFactory, UserFactory
+        from roles.factory import CompanyRolesFactory
+
+        CompanyFactory.create_batch(size=10)
+        print('Factory installed for Company')
+
+        UserFactory.create_batch(size=10)
+        print('Factory installed for User')
+
+        CompanyRolesFactory.create_batch(size=10)
+        print('Factory installed for Company Roles')
 
 
 if __name__ == '__main__':
