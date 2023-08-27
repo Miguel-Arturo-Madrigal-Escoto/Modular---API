@@ -8,6 +8,9 @@ from rest_framework.viewsets import ModelViewSet
 
 from authentication.models import Company, User
 from authentication.serializers import CompanySerializer, UserSerializer
+from experience.models import Experience
+from roles.models import CompanyRoles
+from skills.models import Skill
 
 from .models import Match
 from .serializers import MatchSerializer
@@ -75,12 +78,47 @@ class MatchViewSet(ModelViewSet):
 
     @action(methods=['GET'], detail=False)
     def get_user_match(self, request: Request):
+        string_to_match = ''
+        string_to_match += f'{ request.user.user.position.position } '
+        string_to_match += f'{ request.user.user.expected_salary } '
+        string_to_match += f'{ request.user.user.modality } '
+        string_to_match += f'{ request.user.user.location } '
+        string_to_match += f'{ request.user.user.about } '
+
+        experiences = Experience.objects.filter(user_id=request.user.user.id)
+        for experience in experiences:
+            string_to_match += f'{ experience.description } '
+            string_to_match += f'{ experience.role.position } '
+
+        skills = Skill.objects.filter(user_id=request.user.user.id)
+        for skill in skills:
+            string_to_match += f'{ skill.name } '
+            string_to_match += f'{ skill.description } '
+
+        print(string_to_match)
+
         companies = Company.objects.order_by('?')[0]
         company_serializer = CompanySerializer(instance=companies)
         return Response(company_serializer.data)
 
     @action(methods=['GET'], detail=False)
     def get_company_match(self, request: Request):
+        string_to_match = ''
+        string_to_match += f'{ request.user.company.about } '
+        string_to_match += f'{ request.user.company.mission } '
+        string_to_match += f'{ request.user.company.vision } '
+        string_to_match += f'{ request.user.company.location } '
+        string_to_match += f'{ request.user.company.sector.name } '
+
+        roles = CompanyRoles.objects.filter(company_id=request.user.company.id)
+
+        for rol in roles:
+            string_to_match += f'{ rol.name } '
+            string_to_match += f'{ rol.description } '
+            string_to_match += f'{ rol.role.position } '
+
+        print(string_to_match)
+
         users = User.objects.order_by('?')[0]
         user_serializer = UserSerializer(instance=users)
         return Response(user_serializer.data)

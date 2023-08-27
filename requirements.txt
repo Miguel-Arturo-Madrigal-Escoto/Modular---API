@@ -4,9 +4,11 @@ django-filter
 djangorestframework
 djangorestframework_simplejwt
 djoser
+factory-boy
 Pillow
 pre-commit
 psycopg2-binary
 python-dotenv
 requests
 social-auth-app-django
+translate
