@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from faker import Faker
 
 from authentication.constants import LOCATION_CHOICES, MODALITY_CHOICES
-from authentication.models import BaseUser, Company, User
+from authentication.models import BaseUser, Company, MongoUser, User
 from roles.models import Role
 from sectors.models import Sector
 
@@ -89,3 +89,26 @@ class UserFactory(factory.django.DjangoModelFactory):
         )
         user.save()
         return user
+
+class MongoUserFactory:
+    def __init__(self, users, companies) -> None:
+        self.users = users
+        self.companies = companies
+        self.run()
+
+    def run(self):
+        for user in self.users:
+            mongo_user = MongoUser(
+                base_user=user.base_user.id,
+                email=user.base_user.email,
+                role='user'
+            )
+            mongo_user.save()
+
+        for company in self.companies:
+            mongo_user = MongoUser(
+                base_user=company.base_user.id,
+                email=company.base_user.email,
+                role='company'
+            )
+            mongo_user.save()

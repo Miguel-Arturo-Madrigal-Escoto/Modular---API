@@ -22,17 +22,21 @@ def main():
         execute_from_command_line(['manage.py', 'loaddata', 'initial_roles.json'])
         execute_from_command_line(['manage.py', 'loaddata', 'initial_sectors.json'])
 
-        from authentication.factory import CompanyFactory, UserFactory
+        from authentication.factory import (CompanyFactory, MongoUserFactory,
+                                            UserFactory)
         from roles.factory import CompanyRolesFactory
 
-        CompanyFactory.create_batch(size=10)
-        print('Factory installed for Company')
-
-        UserFactory.create_batch(size=10)
+        users = UserFactory.create_batch(size=10)
         print('Factory installed for User')
+
+        companies = CompanyFactory.create_batch(size=10)
+        print('Factory installed for Company')
 
         CompanyRolesFactory.create_batch(size=10)
         print('Factory installed for Company Roles')
+
+        MongoUserFactory(users, companies)
+        print('Factory installed for MongoDB Users')
 
 
 if __name__ == '__main__':

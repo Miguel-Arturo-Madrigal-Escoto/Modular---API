@@ -1,28 +1,107 @@
-{% load i18n %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-{% block subject %}
-{% blocktrans %}Account activation on {{ site_name }}{% endblocktrans %}
-{% endblock subject %}
+        <title>{{ site_name }}</title>
 
-{% block text_body %}
-{% blocktrans %}You're receiving this email because you need to finish activation process on {{ site_name }}.{% endblocktrans %}
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-{% trans "Please go to the following page to activate account:" %}
-{{ protocol }}://{{ domain }}/{{ url|safe }}
 
-{% trans "Thanks for using our site!" %}
+    </head>
+<body>
+    {% load i18n %}
 
-{% blocktrans %}The {{ site_name }} team{% endblocktrans %}
-{% endblock text_body %}
+    {% block subject %}
+    {% blocktrans %} Activación de la cuenta en {{ site_name }}{% endblocktrans %}
+    {% endblock subject %}
 
-{% block html_body %}
-<p>{% blocktrans %}You're receiving this email because you need to finish activation process on {{ site_name }}.{% endblocktrans %}</p>
+    {% block html_body %}
 
-<p>{% trans "Please click in the button above to activate your account:" %}</p>
-<a href="{{ protocol }}://{{ domain }}/{{ url|safe }}"><button>Activate account</button></a>
+    <section style=
+        "padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #ffffff;
+        max-width: 42rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; "
+    >
+        <header style=
+            "display: flex;
+            flex-direction: row;
+            justify-content: center;"
+        >
+            <!--<img style=
+                "width: 5rem;
+                height: 5rem;
+                border-radius: 9999px;"
+            src="https://drive.google.com/uc?export=view&id=1nxfzoUij9P6DLPVJMSDkJvbCPp2XZEmw" alt="Logo de {{ site_name }}">-->
+        </header>
 
-<p>{% trans "Thanks for using our site!" %}</p>
+        <main style="margin-top: 2rem;">
+            <h2 style="color: #374151;">Hola,</h2>
 
-<p>{% blocktrans %}The {{ site_name }} team{% endblocktrans %}</p>
+            <p style=
+                "margin-top: 1rem;
+                margin-bottom: 1rem;
+                color: #4B5563;
+                line-height: 2;"
+            >
+                Por favor, haga clic en el botón de abajo para verificar su dirección de correo electrónico de <span class="font-semibold ">{{ site_name }}</span>.
+            </p>
 
-{% endblock html_body %}
+
+            <a href="{{ protocol }}://{{ domain }}/{{ url|safe }}" style=
+                "padding-top: 0.625rem;
+                padding-bottom: 0.625rem;
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+                margin-right: 0.5rem;
+                margin-bottom: 0.5rem;
+                background-color: #1D4ED8;
+                color: #ffffff;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                font-weight: 500;
+                border-radius: 0.5rem;
+                text-decoration: none"
+            >
+                Verificar cuenta
+            </a>
+
+
+
+            <p style=
+                "margin-top: 2rem;
+                color: #4B5563;
+                line-height: 2;"
+            >
+                Si tiene problemas para hacer clic en el botón "Verificar cuenta",
+                copie y pegue la siguiente URL en su navegador web: {{ protocol }}://{{ domain }}/{{ url|safe }}
+            </p>
+
+            <p style=
+                "margin-top: 2rem;
+                margin-bottom: 2rem;
+                color: #4B5563;"
+            >
+                Gracias, <br>
+                Equipo <b>{{ site_name }}</b>
+            </p>
+
+        </main>
+    </section>
+
+    {% endblock html_body %}
+</body>
+</html>

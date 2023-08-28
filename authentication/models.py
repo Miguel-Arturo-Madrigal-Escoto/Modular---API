@@ -1,7 +1,12 @@
+import datetime
+from enum import Enum
+
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import (MaxLengthValidator, MinLengthValidator,
                                     MinValueValidator)
 from django.db import models
+from mongoengine import (BooleanField, DateTimeField, Document, EmailField,
+                         EnumField, IntField)
 
 from .constants import LOCATION_CHOICES, MODALITY_CHOICES
 from .managers import CustomUserManager
@@ -72,3 +77,23 @@ class Company(models.Model):
     base_user = models.OneToOneField(
         BaseUser, on_delete=models.CASCADE, related_name='company'
     )
+
+class MongoUserRoleEnum(Enum):
+    USER = 'user'
+    COMPANY = 'company'
+
+class MongoUser(Document):
+    """
+        This model will be used to populate the user collection
+        in MongoDB when running the factories in order to make
+        data persistent for the chat via MongoEngine ODM.
+    """
+    base_user = IntField(min_value=1)
+    email = EmailField()
+    role = EnumField(MongoUserRoleEnum, choices=[MongoUserRoleEnum.USER, MongoUserRoleEnum.COMPANY])
+    online = BooleanField(default=False)
+    createdAt = DateTimeField(default=datetime.datetime.now())
+    updatedAt = DateTimeField(default=datetime.datetime.now())
+    meta = {
+        'collection': 'users'
+    }
