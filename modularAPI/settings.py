@@ -15,6 +15,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
+from mongoengine import connect
 
 # Load environment variables
 load_dotenv()
@@ -148,13 +149,18 @@ WSGI_APPLICATION = 'modularAPI.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Default SQLite DB
+# SQLite DB
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# MongoDB
+connect(host=os.environ.get('MONGO_DATABASE_URL', ''))
+
+# PostgreSQL DB
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
