@@ -6,10 +6,14 @@ djangorestframework_simplejwt
 djoser
 factory-boy
 mongoengine
+numpy
+pandas
 Pillow
 pre-commit
 psycopg2-binary
 python-dotenv
+rake-nltk
 requests
+scikit-learn
 social-auth-app-django
 translate
