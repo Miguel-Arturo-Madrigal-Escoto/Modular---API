@@ -95,7 +95,9 @@ class MatchViewSet(ModelViewSet):
             string_to_match += f'{ skill.name } '
             string_to_match += f'{ skill.description } '
 
-        print(string_to_match)
+        """nlp = NlpAlgorithm()
+        nlp.df_company()
+        nlp.df_company_roles()"""
 
         companies = Company.objects.order_by('?')[0]
         company_serializer = CompanySerializer(instance=companies)
@@ -116,8 +118,6 @@ class MatchViewSet(ModelViewSet):
             string_to_match += f'{ rol.name } '
             string_to_match += f'{ rol.description } '
             string_to_match += f'{ rol.role.position } '
-
-        print(string_to_match)
 
         users = User.objects.order_by('?')[0]
         user_serializer = UserSerializer(instance=users)
@@ -156,5 +156,35 @@ class MatchViewSet(ModelViewSet):
                 'matches': list(matched_companies)
             }
             return Response(response)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['GET'], detail=False)
+    def retrieve_user_matches_list(self, request: Request):
+        try:
+            user_id = request.user.user.id
+            matched_companies = self.get_queryset().filter(
+                user_id=user_id,
+                user_like=True,
+                company_like=True
+            ).values_list('company_id', flat=True)
+            companies = Company.objects.filter(id__in=matched_companies)
+            company_serializer = CompanySerializer(companies, many=True)
+            return Response(company_serializer.data, status=status.HTTP_200_OK)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['GET'], detail=False)
+    def retrieve_company_matches_list(self, request: Request):
+        try:
+            company_id = request.user.company.id
+            matched_users = self.get_queryset().filter(
+                company_id=company_id,
+                user_like=True,
+                company_like=True
+            ).values_list('user_id', flat=True)
+            users = User.objects.filter(id__in=matched_users)
+            user_serializer = UserSerializer(users, many=True)
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
