@@ -12,6 +12,7 @@ from experience.models import Experience
 from roles.models import CompanyRoles
 from skills.models import Skill
 
+from .algorithms.nlp import NlpAlgorithm
 from .models import Match
 from .serializers import MatchSerializer
 
@@ -95,9 +96,9 @@ class MatchViewSet(ModelViewSet):
             string_to_match += f'{ skill.name } '
             string_to_match += f'{ skill.description } '
 
-        """nlp = NlpAlgorithm()
-        nlp.df_company()
-        nlp.df_company_roles()"""
+        nlp = NlpAlgorithm()
+        nlp.df_company(request.user.user, string_to_match)
+        nlp.df_company_roles()
 
         companies = Company.objects.order_by('?')[0]
         company_serializer = CompanySerializer(instance=companies)
@@ -122,42 +123,6 @@ class MatchViewSet(ModelViewSet):
         users = User.objects.order_by('?')[0]
         user_serializer = UserSerializer(instance=users)
         return Response(user_serializer.data)
-
-    @action(methods=['GET'], detail=False)
-    def retrieve_company_matches(self, request: Request):
-        """Retrieves the matches of the company (base_user user ids)"""
-        try:
-            company_id = request.user.company.id
-            matched_user_ids = self.get_queryset().filter(
-                company_id=company_id,
-                company_like=True,
-                user_like=True).values_list('user_id', flat=True)
-            matched_users = User.objects.filter(
-                id__in=matched_user_ids).values_list('base_user', flat=True)
-            response = {
-                'matches': list(matched_users)
-            }
-            return Response(response)
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['GET'], detail=False)
-    def retrieve_user_matches(self, request: Request):
-        """Retrieves the matches of the user (base_user company ids)"""
-        try:
-            user_id = request.user.user.id
-            matched_company_ids = self.get_queryset().filter(
-                user_id=user_id,
-                company_like=True,
-                user_like=True).values_list('company_id', flat=True)
-            matched_companies = Company.objects.filter(
-                id__in=matched_company_ids).values_list('base_user', flat=True)
-            response = {
-                'matches': list(matched_companies)
-            }
-            return Response(response)
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['GET'], detail=False)
     def retrieve_user_matches_list(self, request: Request):
