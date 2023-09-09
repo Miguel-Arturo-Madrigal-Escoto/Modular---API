@@ -6,7 +6,7 @@ from rake_nltk import Rake
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from authentication.models import Company, User
+from authentication.models import BaseUser, Company, User
 from roles.models import CompanyRoles
 
 # flake8: noqa
@@ -92,9 +92,9 @@ class NlpAlgorithm:
 
         # list of recommended ids
         recommended_company_ids = self.recommend_companies(df, cosine_sim=cos)
-        preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(recommended_company_ids)])
-        recommended_companies = Company.objects.filter(id__in=recommended_company_ids).order_by(preserved_order).values()
-        print(recommended_company_ids)
+        preserved_order = Case(*[When(company=pk, then=pos) for pos, pk in enumerate(recommended_company_ids)])
+        recommended_companies = BaseUser.objects.filter(company__in=recommended_company_ids).order_by(preserved_order)
+        return recommended_companies
         # 2 3 1
 
 

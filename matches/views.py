@@ -7,7 +7,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from authentication.models import Company, User
-from authentication.serializers import CompanySerializer, UserSerializer
+from authentication.serializers import (CompanySerializer,
+                                        MyBaseCurrentUserSerializer,
+                                        UserSerializer)
 from experience.models import Experience
 from roles.models import CompanyRoles
 from skills.models import Skill
@@ -97,11 +99,8 @@ class MatchViewSet(ModelViewSet):
             string_to_match += f'{ skill.description } '
 
         nlp = NlpAlgorithm()
-        nlp.df_company(request.user.user, string_to_match)
-        nlp.df_company_roles()
-
-        companies = Company.objects.order_by('?')[0]
-        company_serializer = CompanySerializer(instance=companies)
+        companies = nlp.df_company(request.user.user, string_to_match)
+        company_serializer = MyBaseCurrentUserSerializer(instance=companies, many=True)
         return Response(company_serializer.data)
 
     @action(methods=['GET'], detail=False)
