@@ -20,7 +20,8 @@ class SkillViewSet(ModelViewSet):
 
     def list(self, request: Request):
         try:
-            skills = self.get_queryset().filter(user=request.user.user.id)
+            user_id = request.query_params.get('user_id', '')
+            skills = self.get_queryset().filter(user=user_id)
             serializer = self.get_serializer(instance=skills, many=True)
             return Response(serializer.data)
         except Exception:

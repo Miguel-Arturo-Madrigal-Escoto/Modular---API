@@ -20,7 +20,8 @@ class ExperienceViewSet(ModelViewSet):
 
     def list(self, request: Request):
         try:
-            experiences = self.get_queryset().filter(user=request.user.user.id)
+            user_id = request.query_params.get('user_id', '')
+            experiences = self.get_queryset().filter(user=user_id)
             serializer = self.get_serializer(instance=experiences, many=True)
             return Response(serializer.data)
         except Exception:
