@@ -113,6 +113,7 @@ AUTHENTICATION_BACKENDS = (
 MIDDLEWARE = [
     'health.middleware.HealthCheckMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'modularAPI.middleware.ResetMatchMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

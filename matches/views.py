@@ -119,8 +119,9 @@ class MatchViewSet(ModelViewSet):
             string_to_match += f'{ rol.description } '
             string_to_match += f'{ rol.role.position } '
 
-        users = User.objects.order_by('?')[0]
-        user_serializer = UserSerializer(instance=users)
+        nlp = NlpAlgorithm()
+        users = nlp.df_user(request.user.company, string_to_match)
+        user_serializer = MyBaseCurrentUserSerializer(instance=users, many=True)
         return Response(user_serializer.data)
 
     @action(methods=['GET'], detail=False)
