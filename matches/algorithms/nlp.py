@@ -1,13 +1,14 @@
 from collections import OrderedDict
 
 import pandas as pd
-from django.db.models import Case, When
+from django.db.models import Case, Q, When
 from rake_nltk import Rake
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from authentication.models import BaseUser, Company, User
 from experience.models import Experience
+from matches.models import Match
 from roles.models import CompanyRoles
 from skills.models import Skill
 
@@ -185,16 +186,20 @@ class NlpAlgorithm:
         cos = cosine_similarity(sparse_matrix[0, :], sparse_matrix[1:, :])
 
         # list of recommended ids
-        recommended_user_ids = self.recommend_users(df, cosine_sim=cos)
+        recommended_user_ids = self.recommend_users(df, company,cosine_sim=cos)
 
         preserved_order = Case(*[When(user=pk, then=pos) for pos, pk in enumerate(recommended_user_ids)])
+
+        print(preserved_order)
+
         recommended_users = BaseUser.objects.filter(user__in=recommended_user_ids).order_by(preserved_order)
         return recommended_users
-        # 2 3 1
-
 
     def recommend_companies(self, df, cosine_sim):
         recommended_companies = []
+
+        # Quitar perfiles con los que se ha interactuado
+
         score_series = pd.Series(cosine_sim[0]).sort_values(ascending = False)
         top_10_indices = list(score_series.iloc[0:10].index)
 
@@ -203,13 +208,32 @@ class NlpAlgorithm:
 
         return recommended_companies
 
-    def recommend_users(self, df, cosine_sim):
+    def recommend_users(self, df, company, cosine_sim):
         recommended_users = []
-        score_series = pd.Series(cosine_sim[0]).sort_values(ascending = False)
-        top_10_indices = list(score_series.iloc[0:10].index)
 
-        for i in top_10_indices:
-            recommended_users.append(list(df['id'])[i])
+        # Quitar perfiles con los que se ha interactuado
+        interacted_matches = Match.objects.filter(company_like__isnull=False, company=company).values_list('user_id', flat=True).distinct()
+        # interacted_matches = [2, 34, 5]
+
+        # con los que no ha interactuado
+        df = df[~df['id'].isin(interacted_matches)]
+
+        # iterando fila por fila
+        #   id
+        #   1 in [2, 34, 5] => False => True
+        #   3 in [2, 34, 5] => False => True
+
+        unordered_score_series = pd.Series(cosine_sim[0])
+        unordered_score_series_frame = unordered_score_series.to_frame(name='score')
+        unordered_score_series_frame.index = unordered_score_series_frame.index + 1
+
+        df = df.merge(unordered_score_series_frame, left_on='id', right_index=True, how='inner')
+        df = df.sort_values(by='score', ascending=False)
+
+        if df.empty:
+            return []
+
+        recommended_users = df['id'].values.tolist()
 
         return recommended_users
 
