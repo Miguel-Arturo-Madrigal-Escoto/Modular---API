@@ -6,7 +6,7 @@ from django.core.validators import (MaxLengthValidator, MinLengthValidator,
                                     MinValueValidator)
 from django.db import models
 from mongoengine import (BooleanField, DateTimeField, Document, EmailField,
-                         EnumField, IntField)
+                         EnumField, IntField, StringField)
 
 from .constants import LOCATION_CHOICES, MODALITY_CHOICES
 from .managers import CustomUserManager
@@ -89,6 +89,7 @@ class MongoUser(Document):
         data persistent for the chat via MongoEngine ODM.
     """
     base_user = IntField(min_value=1)
+    name = StringField()
     email = EmailField()
     role = EnumField(MongoUserRoleEnum, choices=[MongoUserRoleEnum.USER, MongoUserRoleEnum.COMPANY])
     online = BooleanField(default=False)

@@ -100,6 +100,7 @@ class MongoUserFactory:
         for user in self.users:
             mongo_user = MongoUser(
                 base_user=user.base_user.id,
+                name=user.name,
                 email=user.base_user.email,
                 role='user'
             )
@@ -108,6 +109,7 @@ class MongoUserFactory:
         for company in self.companies:
             mongo_user = MongoUser(
                 base_user=company.base_user.id,
+                name=company.name,
                 email=company.base_user.email,
                 role='company'
             )
