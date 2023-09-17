@@ -99,7 +99,7 @@ class MatchViewSet(ModelViewSet):
             string_to_match += f'{ skill.description } '
 
         nlp = NlpAlgorithm()
-        companies = nlp.df_company(request.user.user, string_to_match)
+        companies = nlp.nlpPreprocessing(request.user.user, string_to_match)
         company_serializer = MyBaseCurrentUserSerializer(instance=companies, many=True)
         return Response(company_serializer.data)
 
@@ -120,7 +120,7 @@ class MatchViewSet(ModelViewSet):
             string_to_match += f'{ rol.role.position } '
 
         nlp = NlpAlgorithm()
-        users = nlp.df_user(request.user.company, string_to_match)
+        users = nlp.nlpPreprocessing(request.user.company, string_to_match)
         user_serializer = MyBaseCurrentUserSerializer(instance=users, many=True)
         return Response(user_serializer.data)
 
