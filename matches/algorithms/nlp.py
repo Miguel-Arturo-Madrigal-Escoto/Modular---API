@@ -73,16 +73,16 @@ class NlpAlgorithm:
 
     def sorted_recommendations(self, is_user, recommended_ids):
         """
-        * aide
+        This method sorts recommendations based on cosine similarity. Depending on whether obj is a user (User) or a company (Company), recommendations are sorted appropriately.
 
         Args:
-            df (int): asasa
-            obj (int): ssasasa
-            cosine_sim (int): assas
+            is_user (boolean): A boolean indicating whether obj is a user (User).
+            recommended_ids (list): A list of recommended IDs (BaseUser ID).
 
         Returns:
-            cosine_sim (string): asasasa
+            recommendations (list): List of recommendations sorted by similarity.
         """
+
         recommendations = []
         if is_user:
             preserved_order_ids = Case(*[When(company=pk, then=pos) for pos, pk in enumerate(recommended_ids)])
@@ -192,16 +192,16 @@ class NlpAlgorithm:
 
     def add_company_data_to_df(self, df):
         """
-        * aide
+        This method adds one column to the dataframe for every company: CompanyRoles.
+        This is performed by querying to the database relying on the CompanyRoles model.
 
         Args:
-            df (int): asasa
-            obj (int): ssasasa
-            cosine_sim (int): assas
+            df (pd.DataFrame): Dataframe that stores info about the companies (Company database model).
 
         Returns:
-            cosine_sim (string): asasasa
+            df (pd.DataFrame): The updated DataFrame with roles column.
         """
+
         all_roles = {}
         for company in Company.objects.all():
             all_roles[company.id] = ''
