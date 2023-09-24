@@ -42,8 +42,6 @@ class NlpAlgorithm:
 
         df = pd.DataFrame(list(Model.objects.all().values(*(company_fields if is_user else (user_fields)))))
 
-        # company_df_cols = ['new_mission', 'new_vision', 'new_about', 'new_roles']
-        # user_df_cols = ['new_position', 'new_about', 'new_experiences', 'new_skills']
         cols_to_extract = []
         base_cols = []
 
@@ -97,15 +95,17 @@ class NlpAlgorithm:
 
     def cosine_similarity_algorithm(self, df, target_str):
         """
-        * miguel
+        Constructs the vocabulary (set of unique words) using all of the content
+        in count.fit_transform() method. Then, a matrix is built by relying on the
+        times that a word appear for every document.
 
         Args:
-            df (int): asasa
-            obj (int): ssasasa
-            cosine_sim (int): assas
+            df (pd.DataFrame): the dataframe that contains the users/companies content + bag of words
+            target_str (str): the entire user|company string (with all the information in it).
 
         Returns:
-            cosine_sim (string): asasasa
+            cosine_sim (pd.ndarray): a pandas array/matrix that contains the result of the comparison
+            between the users|company data (dataframe) and the auth user info (target_str).
         """
         # bag of words (frecuency) of all the rows
         count = CountVectorizer()
@@ -117,21 +117,22 @@ class NlpAlgorithm:
 
     def fill_bag_of_words(self, df, columns):
         """
-        * miguel
+        Approach used in NLP to represent documents (ej: a user|company data is a document)
+        ignoring the order of the words. This method fills the bag of words column
+        for every user|company with the info in the given columns.
 
         Args:
-            df (int): asasa
-            obj (int): ssasasa
-            cosine_sim (int): assas
+            df (pd.DataFrame): the dataframe that contains the users/companies content in its columns.
+            columns (list): the colums to be used to fill the new bag of words column.
 
         Returns:
-            cosine_sim (string): asasasa
+            None.
         """
         for index, row in df.iterrows():
             words = ''
             for col in columns:
                 words += str(row[col]) + ' '
-            df.at[index,'bag_of_words'] = words
+            df.at[index, 'bag_of_words'] = words
 
         # strip white spaces infront and behind, replace multiple whitespaces (if any)
         df['bag_of_words'] = df['bag_of_words'].str.strip().str.replace('   ', ' ').str.replace('  ', ' ')
@@ -158,15 +159,14 @@ class NlpAlgorithm:
 
     def add_user_data_to_df(self, df):
         """
-        * miguel
+        Adds two columns to the dataframe for every user: skills & experiences.
+        This is performed by querying to the database relying on these two models.
 
         Args:
-            df (int): asasa
-            obj (int): ssasasa
-            cosine_sim (int): assas
+            df (pd.DataFrame): dataframe that stores info about the users (User database model).
 
         Returns:
-            cosine_sim (string): asasasa
+            None.
         """
         all_skills = {}
         for user in Skill.objects.all():
