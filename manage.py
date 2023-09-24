@@ -33,7 +33,7 @@ def main():
                                             UserFactory)
         from roles.factory import CompanyRolesFactory
 
-        users = UserFactory.create_batch(size=10)
+        """users = UserFactory.create_batch(size=10)
         print('Factory installed for User')
 
         companies = CompanyFactory.create_batch(size=10)
@@ -43,7 +43,7 @@ def main():
         print('Factory installed for Company Roles')
 
         MongoUserFactory(users, companies)
-        print('Factory installed for MongoDB Users')
+        print('Factory installed for MongoDB Users')"""
 
 
 if __name__ == '__main__':
