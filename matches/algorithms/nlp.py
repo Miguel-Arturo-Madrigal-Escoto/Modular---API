@@ -24,16 +24,17 @@ class NlpAlgorithm:
         self.r = Rake(language='spanish')
 
 
-    def nlpPreprocessing(self, obj, target_str: str):
+    def generateNLPRecommendations(self, obj, target_str: str):
         """
-        * kevin
+        Preprocesses user or company profiles for NLP-based recommendation generation by extracting key information, 
+        performing keyword analysis, and calculating profile similarity scores to provide personalized recommendations
 
         Args:
-            obj (int): ssasasa
-            string_to_match (str): assas
+            obj (User or Company): The user or company object for which data is being processed.
+            target_str (str): The target string for similarity comparison.
 
         Returns:
-            var (string): asasasa
+            recommendations (list): A list of recommended user or company profiles based on similarity to the target string.
         """
         user_fields = ('id', 'name', 'lastname', 'position__position', 'expected_salary', 'modality', 'location', 'about')
         company_fields = ('id', 'name', 'about', 'mission', 'vision', 'location')
@@ -141,15 +142,15 @@ class NlpAlgorithm:
 
     def keywords_extraction_from_text(self, df, columns):
         """
-        * kevin
+        This function extracts keywords from text data in the specified columns of the input DataFrame
+        using the Rake algorithm and updates the DataFrame in place with the extracted keywords
 
         Args:
-            df (int): asasa
-            obj (int): ssasasa
-            cosine_sim (int): assas
+            df (pandas.DataFrame): The DataFrame containing text data.
+            columns (list): A list of column names in the DataFrame to extract keywords from
 
         Returns:
-            cosine_sim (string): asasasa
+            None
         """
         for index, row in df.iterrows():
             for column in columns:
@@ -218,16 +219,13 @@ class NlpAlgorithm:
 
     def recommend(self, df, obj, cosine_sim):
         """
-        * kevin
-        Este método genera recomendaciones (ids) basadas en la similitud de las palabras clave y los datos en el DataFrame. Filtra las recomendaciones para excluir aquellos con los que el usuario o la empresa haya interactuado previamente.
-
         Args:
-            df: Un DataFrame que contiene datos de usuarios o empresas.
-            obj: Un objeto que puede ser un usuario (User) o una empresa (Company).
-            cosine_sim: Una matriz de similitud del coseno.
+            df (pandas.DataFrame): A DataFrame containing user or company profiles
+            obj (User or Company): The user or company object for which recommendations are generated
+            cosine_sim (numpy.ndarray): A cosine similarity matrix representing user or company interactions
 
         Returns:
-            Retorna una lista de recomendaciones (ids) ordenadas basadas en la similitud.
+            recommendations (list): A list of recommended user or company profiles
         """
         interacted_matches = None
 
