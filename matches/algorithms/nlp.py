@@ -265,8 +265,8 @@ class NlpAlgorithm:
         df = df.merge(cosine_sim_df, left_on='id', right_index=True, how='inner')
         df = df[df['score'] >= 0.25]
         df = df.sort_values(by='score', ascending=False)
-        df.to_csv('final_results.csv')
-        print(df)
+        # df.to_csv('final_results.csv')
+        # print(df)
         if df.empty:
             return []
         recommendations = df['id'].values.tolist()
