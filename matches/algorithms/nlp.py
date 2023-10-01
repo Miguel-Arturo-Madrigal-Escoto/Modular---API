@@ -1,11 +1,12 @@
 import warnings
 from collections import OrderedDict
 
-import pandas as pd
 from django.db.models import Case, When
+from nltk.corpus import wordnet
+import pandas as pd
 from rake_nltk import Rake
-from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 from authentication.models import BaseUser, Company, User
 from experience.models import Experience
@@ -21,7 +22,7 @@ class NlpAlgorithm:
     def __init__(self) -> None:
         # Uses stopwords for spanish from NLTK, and all puntuation characters.
         # self.r = Rake()
-        self.r = Rake(language='spanish')
+        self.r = Rake(language='spanish', include_repeated_phrases=False)
 
 
     def generateNLPRecommendations(self, obj, target_str: str):
@@ -65,7 +66,6 @@ class NlpAlgorithm:
 
         self.fill_bag_of_words(df, cols_to_extract+base_cols)
         cosine_sim = self.cosine_similarity_algorithm(df, target_str)
-        df.to_csv('current_bag_of_words.csv')
 
         recommended_ids = self.recommend(df, obj, cosine_sim)
 
@@ -109,10 +109,13 @@ class NlpAlgorithm:
             between the users|company data (dataframe) and the auth user info (target_str).
         """
         # bag of words (frecuency) of all the rows
-        count = CountVectorizer()
+        # tfidf_vectorizer = TfidfVectorizer(max_df=0.85, ngram_range=(1, 2), max_features=1_000, sublinear_tf=True, smooth_idf=False)
+        tfidf_vectorizer = TfidfVectorizer(sublinear_tf=True)
+        tfidf_matrix = tfidf_vectorizer.fit_transform(df['bag_of_words'])
 
-        sparse_matrix = count.fit_transform([target_str]+df['bag_of_words'].to_list())
-        cos = cosine_similarity(sparse_matrix[0, :], sparse_matrix[1:, :])
+        self.r.extract_keywords_from_text(target_str)
+        cos = cosine_similarity(tfidf_vectorizer.transform([' '.join(self.r.get_ranked_phrases())]), tfidf_matrix)
+        
         return cos
 
 
@@ -154,9 +157,27 @@ class NlpAlgorithm:
         """
         for index, row in df.iterrows():
             for column in columns:
-                self.r.extract_keywords_from_text(f'{row[column[4:]]}')
-                df.at[index, column] = ' '.join(list(self.r.get_word_degrees().keys()))
+                self.r.extract_keywords_from_text(row[column[4:]])
+                df.at[index, column] = ' '.join(self._find_synonyms(self.r.get_ranked_phrases()))
 
+    def _find_synonyms(self, lemmas: list[str]) -> list[str]:
+        """
+        Finds synonyms for a list of lemmas using WordNet in Spanish.
+
+        Args:
+            lemmas (list[str]): A list of lemmas for which synonyms will be found.
+
+        Returns:
+            list[str]: A list of unique synonyms for the input lemmas.
+        """
+        synonyms = set(lemmas)
+        for lemma in lemmas:
+            s = wordnet.synsets(lemma, pos='n', lang="spa")
+            if not s or len(s) == 0:
+                continue
+            for l in s[0].lemmas(lang="spa"):
+                synonyms.add(l.name().replace('_', ' '))
+        return list(synonyms)
 
     def add_user_data_to_df(self, df):
         """
@@ -243,11 +264,11 @@ class NlpAlgorithm:
         cosine_sim_df.index += 1
 
         df = df.merge(cosine_sim_df, left_on='id', right_index=True, how='inner')
+        df = df[df['score'] >= 0.25]
         df = df.sort_values(by='score', ascending=False)
-
+        df.to_csv('final_results.csv')
         if df.empty:
             return []
-
         recommendations = df['id'].values.tolist()
 
         return recommendations
