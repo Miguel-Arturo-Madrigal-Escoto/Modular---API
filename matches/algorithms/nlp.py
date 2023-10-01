@@ -6,7 +6,7 @@ from nltk.corpus import wordnet
 import pandas as pd
 from rake_nltk import Rake
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 
 from authentication.models import BaseUser, Company, User
 from experience.models import Experience
@@ -109,12 +109,11 @@ class NlpAlgorithm:
             between the users|company data (dataframe) and the auth user info (target_str).
         """
         # bag of words (frecuency) of all the rows
-        # tfidf_vectorizer = TfidfVectorizer(max_df=0.85, ngram_range=(1, 2), max_features=1_000, sublinear_tf=True, smooth_idf=False)
-        tfidf_vectorizer = TfidfVectorizer(sublinear_tf=True)
-        tfidf_matrix = tfidf_vectorizer.fit_transform(df['bag_of_words'])
+        count_vectorizer = CountVectorizer(lowercase=True)
+        count_matrix = count_vectorizer.fit_transform(df['bag_of_words'])
 
         self.r.extract_keywords_from_text(target_str)
-        cos = cosine_similarity(tfidf_vectorizer.transform([' '.join(self.r.get_ranked_phrases())]), tfidf_matrix)
+        cos = cosine_similarity(count_vectorizer.transform([' '.join(self.r.get_ranked_phrases())]), count_matrix)
         
         return cos
 
@@ -267,6 +266,7 @@ class NlpAlgorithm:
         df = df[df['score'] >= 0.25]
         df = df.sort_values(by='score', ascending=False)
         df.to_csv('final_results.csv')
+        print(df)
         if df.empty:
             return []
         recommendations = df['id'].values.tolist()
