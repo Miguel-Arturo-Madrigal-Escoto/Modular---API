@@ -18,14 +18,18 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
-    # NLP Libraries
-    import nltk
-
-    nltk.download('stopwords', download_dir='./')
-    nltk.download('punkt', download_dir='./')
 
     # Load fixtures & factories into db
     if len(sys.argv) == 2 and sys.argv[1] == 'migrate':
+        # NLP Libraries
+        import nltk
+
+        nltk.download('stopwords', download_dir='./')
+        nltk.download('punkt', download_dir='./')
+
+        nltk.download('omw-1.4', download_dir='./corpora')
+        nltk.download('wordnet', download_dir='./corpora')
+
         execute_from_command_line(['manage.py', 'loaddata', 'initial_roles.json'])
         execute_from_command_line(['manage.py', 'loaddata', 'initial_sectors.json'])
 

@@ -1,12 +1,13 @@
 import warnings
 from collections import OrderedDict
 
+import nltk
+import pandas as pd
 from django.db.models import Case, When
 from nltk.corpus import wordnet
-import pandas as pd
 from rake_nltk import Rake
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from authentication.models import BaseUser, Company, User
 from experience.models import Experience
@@ -15,6 +16,7 @@ from roles.models import CompanyRoles
 from skills.models import Skill
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
+nltk.data.path.append('./')
 
 # flake8: noqa
 
@@ -27,7 +29,7 @@ class NlpAlgorithm:
 
     def generateNLPRecommendations(self, obj, target_str: str):
         """
-        Preprocesses user or company profiles for NLP-based recommendation generation by extracting key information, 
+        Preprocesses user or company profiles for NLP-based recommendation generation by extracting key information,
         performing keyword analysis, and calculating profile similarity scores to provide personalized recommendations
 
         Args:
@@ -113,8 +115,8 @@ class NlpAlgorithm:
         count_matrix = count_vectorizer.fit_transform(df['bag_of_words'])
 
         self.r.extract_keywords_from_text(target_str)
-        cos = cosine_similarity(count_vectorizer.transform([' '.join(self.r.get_ranked_phrases())]), count_matrix)
-        
+        cos = cosine_similarity(count_vectorizer.transform([' '.join(self._find_synonyms(self.r.get_ranked_phrases()))]), count_matrix)
+
         return cos
 
 
@@ -171,12 +173,14 @@ class NlpAlgorithm:
         """
         synonyms = set(lemmas)
         for lemma in lemmas:
-            s = wordnet.synsets(lemma, pos='n', lang="spa")
+            s = wordnet.synsets(lemma, pos='n', lang='spa')
             if not s or len(s) == 0:
                 continue
-            for l in s[0].lemmas(lang="spa"):
+            for l in s[0].lemmas(lang='spa'):
                 synonyms.add(l.name().replace('_', ' '))
-        return list(synonyms)
+
+        synonyms = [word.lower() for word in list(synonyms)]
+        return synonyms
 
     def add_user_data_to_df(self, df):
         """
@@ -263,7 +267,7 @@ class NlpAlgorithm:
         cosine_sim_df.index += 1
 
         df = df.merge(cosine_sim_df, left_on='id', right_index=True, how='inner')
-        df = df[df['score'] >= 0.25]
+        df = df[df['score'] > 0]
         df = df.sort_values(by='score', ascending=False)
         # df.to_csv('final_results.csv')
         # print(df)
