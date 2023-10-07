@@ -27,8 +27,8 @@ def main():
         nltk.download('stopwords', download_dir='./')
         nltk.download('punkt', download_dir='./')
 
-        nltk.download('omw-1.4', download_dir='./corpora')
-        nltk.download('wordnet', download_dir='./corpora')
+        nltk.download('omw-1.4', download_dir='./')
+        nltk.download('wordnet', download_dir='./')
 
         execute_from_command_line(['manage.py', 'loaddata', 'initial_roles.json'])
         execute_from_command_line(['manage.py', 'loaddata', 'initial_sectors.json'])
