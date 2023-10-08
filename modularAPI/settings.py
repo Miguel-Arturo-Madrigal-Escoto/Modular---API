@@ -17,6 +17,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from mongoengine import connect
 
+# flake8: noqa
+
 # Load environment variables
 load_dotenv()
 
@@ -28,10 +30,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0$-39v&v693fl^!@!kec_pvt1z_i+p&e4&g!p#_p=0swp)i%__'
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.environ.get('DEBUG', 1)))
+print(DEBUG)
 
 ALLOWED_HOSTS = []
 
@@ -152,27 +155,27 @@ WSGI_APPLICATION = 'modularAPI.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # SQLite DB
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# MongoDB
-connect(host=os.environ.get('MONGO_DATABASE_URL', ''))
-
-# PostgreSQL DB
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DB_NAME'),
-#         'USER': os.environ.get('DB_USER'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD'),
-#         'PORT': os.environ.get('DB_PORT'),
-#         'HOST': os.environ.get('DB_HOST'),
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+# MongoDB
+# connect(host=os.environ.get('MONGO_DATABASE_URL', ''))
+
+# PostgreSQL DB
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'PORT': os.environ.get('DB_PORT'),
+        'HOST': os.environ.get('DB_HOST'),
+    }
+}
 
 
 # Password validation
@@ -210,6 +213,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

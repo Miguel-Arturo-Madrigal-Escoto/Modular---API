@@ -30,8 +30,14 @@ def main():
         nltk.download('omw-1.4', download_dir='./')
         nltk.download('wordnet', download_dir='./')
 
-        execute_from_command_line(['manage.py', 'loaddata', 'initial_roles.json'])
-        execute_from_command_line(['manage.py', 'loaddata', 'initial_sectors.json'])
+        from roles.models import Role
+        from sectors.models import Sector
+
+        # avoid insert roles & sectors if already exists
+        if Role.objects.all().count() == 0:
+            execute_from_command_line(['manage.py', 'loaddata', 'initial_roles.json'])
+        if Sector.objects.all().count() == 0:
+            execute_from_command_line(['manage.py', 'loaddata', 'initial_sectors.json'])
 
         from authentication.factory import (CompanyFactory, MongoUserFactory,
                                             UserFactory)

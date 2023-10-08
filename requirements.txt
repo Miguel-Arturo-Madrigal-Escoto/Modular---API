@@ -5,6 +5,7 @@ djangorestframework
 djangorestframework_simplejwt
 djoser
 factory-boy
+gunicorn
 mongoengine
 numpy
 pandas
