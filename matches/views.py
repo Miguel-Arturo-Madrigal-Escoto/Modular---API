@@ -101,6 +101,7 @@ class MatchViewSet(ModelViewSet):
         nlp = NlpAlgorithm()
         companies = nlp.generateNLPRecommendations(request.user.user, string_to_match)
         company_serializer = MyBaseCurrentUserSerializer(instance=companies, many=True)
+        print(string_to_match)
         return Response(company_serializer.data)
 
     @action(methods=['GET'], detail=False)
