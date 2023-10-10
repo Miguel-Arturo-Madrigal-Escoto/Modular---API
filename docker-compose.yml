@@ -1,23 +1,23 @@
 version: '3'
 
 services:
-  db:
-    image: postgres:alpine3.18
-    restart: always
-    env_file:
-      - ./.env
-    ports:
-        - ${DB_PORT}:${DB_PORT}
-    environment:
-        POSTGRES_DB: ${DB_NAME}
-        POSTGRES_USER: ${DB_USER}
-        POSTGRES_PASSWORD: ${DB_PASSWORD}
-    container_name: ${DB_NAME}
-    volumes:
-      - modular-vol:/var/lib/postgresql/data
+  # db:
+  #   image: postgres:alpine3.18
+  #   restart: always
+  #   env_file:
+  #     - ./.env
+  #   ports:
+  #       - ${DB_PORT}:${DB_PORT}
+  #   environment:
+  #       POSTGRES_DB: ${DB_NAME}
+  #       POSTGRES_USER: ${DB_USER}
+  #       POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #   container_name: ${DB_NAME}
+  #   volumes:
+  #     - modular-vol:/var/lib/postgresql/data
 
   app:
-    image: modular-api
+    image: 2kmiguel64/modular-api
     restart: always
     env_file:
       - ./.env
@@ -26,13 +26,13 @@ services:
       dockerfile: Dockerfile
     command: >
       sh -c "python manage.py migrate &&
-             gunicorn --bind=0.0.0.0 --timeout 600 modularAPI.wsgi"
+             gunicorn --bind 0.0.0.0:$PORT modularAPI.wsgi:application"
     volumes:
       - .:/app
     ports:
       - ${PORT}:${PORT}
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
     container_name: modular-api
 
 volumes:

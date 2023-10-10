@@ -22,3 +22,9 @@ RUN python manage.py collectstatic --noinput
 
 # create django migrations
 RUN python manage.py makemigrations
+
+# expose port 8000
+EXPOSE $PORT
+
+# run project with gunicorn
+CMD ["gunicorn", "modularAPI.wsgi"]
