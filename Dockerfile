@@ -17,14 +17,17 @@ RUN pip install -r requirements.txt
 # copy all files to work directory
 COPY . .
 
+# add permissions to entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
 # collect static files (Django REST Framework API)
 RUN python manage.py collectstatic --noinput
 
-# create django migrations
-RUN python manage.py makemigrations
+# Set entrypoint.sh
+ENTRYPOINT ["./entrypoint.sh"]
 
 # expose port 8000
 EXPOSE $PORT
 
 # run project with gunicorn
-CMD ["gunicorn", "modularAPI.wsgi"]
+CMD ["gunicorn", "--workers=2", "--threads=4", "modularAPI.wsgi"]
