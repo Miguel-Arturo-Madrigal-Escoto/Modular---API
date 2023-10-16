@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.11.6
+FROM --platform=linux/amd64 python:3.11.6
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1

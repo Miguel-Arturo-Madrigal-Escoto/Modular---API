@@ -17,7 +17,7 @@ services:
       - modular-vol:/var/lib/postgresql/data
 
   app:
-    image: modular-api
+    image: 2kmiguel64/modular-api:1.0.3
     restart: always
     env_file:
       - ./.env

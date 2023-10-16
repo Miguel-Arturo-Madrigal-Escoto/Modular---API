@@ -1,6 +1,7 @@
 import datetime
 from enum import Enum
 
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import (MaxLengthValidator, MinLengthValidator,
                                     MinValueValidator)
@@ -50,7 +51,7 @@ class User(models.Model):
     about = models.TextField(validators=[
         MinLengthValidator(20)
     ])
-    image = models.ImageField(upload_to='images/user', null=True)
+    image = CloudinaryField('images/user', null=True, blank=True)
     base_user = models.OneToOneField(
         BaseUser, on_delete=models.CASCADE, related_name='user'
     )
@@ -73,14 +74,16 @@ class Company(models.Model):
     verified = models.BooleanField(default=False)
     location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
     sector = models.ForeignKey('sectors.Sector', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='images/company', null=True)
+    image = CloudinaryField('images/company', null=True, blank=True)
     base_user = models.OneToOneField(
         BaseUser, on_delete=models.CASCADE, related_name='company'
     )
 
+
 class MongoUserRoleEnum(Enum):
     USER = 'user'
     COMPANY = 'company'
+
 
 class MongoUser(Document):
     """

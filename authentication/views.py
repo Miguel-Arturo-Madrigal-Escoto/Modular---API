@@ -26,6 +26,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['base_user']
 
+
 class GoogleOAuth2(APIView):
     def get(self, request: Request):
         oauth2 = OAuth2(provider='google', request=request)
