@@ -17,16 +17,16 @@ services:
       - modular-vol:/var/lib/postgresql/data
 
   app:
-    image: 2kmiguel64/modular-api:1.0.2
+    image: 2kmiguel64/modular-api:1.0.3
     restart: always
     env_file:
       - ./.env
     build:
       context: .
       dockerfile: Dockerfile
-    # command: >
-    #   sh -c "python manage.py migrate &&
-    #          gunicorn --bind=0.0.0.0 --threads=2 --threads=4 modularAPI.wsgi"
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn --bind=0.0.0.0 --threads=2 --threads=4 modularAPI.wsgi"
     volumes:
       - .:/app
     ports:
