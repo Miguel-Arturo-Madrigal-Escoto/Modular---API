@@ -1,3 +1,4 @@
+cloudinary
 django
 django-cors-headers
 django-filter

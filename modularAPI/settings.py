@@ -14,6 +14,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import cloudinary
 from dotenv import load_dotenv
 from mongoengine import connect
 
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     'djoser',
     'social_django',
     'django_filters',
+    'cloudinary',
     'health',
     'roles',
     'sectors',
@@ -179,6 +181,12 @@ DATABASES = {
     }
 }
 
+# Cloudinary configuration
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUD_NAME', ''),
+    api_key=os.environ.get('API_KEY', ''),
+    api_secret=os.environ.get('API_SECRET', ''),
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
