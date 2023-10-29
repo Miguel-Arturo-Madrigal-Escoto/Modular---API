@@ -2,8 +2,9 @@ import warnings
 from collections import OrderedDict
 
 import nltk
+import numpy as np
 import pandas as pd
-from django.db.models import Case, When
+from django.db.models import Case, Count, When
 from nltk.corpus import wordnet
 from rake_nltk import Rake
 from sklearn.feature_extraction.text import CountVectorizer
@@ -11,6 +12,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from authentication.models import BaseUser, Company, User
 from experience.models import Experience
+from matches.algorithms.k_means import KMeans
 from matches.models import Match
 from roles.models import CompanyRoles
 from skills.models import Skill
@@ -67,9 +69,9 @@ class NlpAlgorithm:
         df['bag_of_words'] = ''
 
         self.fill_bag_of_words(df, cols_to_extract+base_cols)
-        cosine_sim = self.cosine_similarity_algorithm(df, target_str)
+        similarities = self.cosine_similarity_algorithm(df, target_str, is_user)
 
-        recommended_ids = self.recommend(df, obj, cosine_sim)
+        recommended_ids = self.recommend(df, obj, similarities)
 
         return self.sorted_recommendations(is_user, recommended_ids)
 
@@ -96,7 +98,7 @@ class NlpAlgorithm:
         return recommendations
 
 
-    def cosine_similarity_algorithm(self, df, target_str):
+    def cosine_similarity_algorithm(self, df, target_str, is_user: bool):
         """
         Constructs the vocabulary (set of unique words) using all of the content
         in count.fit_transform() method. Then, a matrix is built by relying on the
@@ -115,9 +117,84 @@ class NlpAlgorithm:
         count_matrix = count_vectorizer.fit_transform(df['bag_of_words'])
 
         self.r.extract_keywords_from_text(target_str)
-        cos = cosine_similarity(count_vectorizer.transform([' '.join(self._find_synonyms(self.r.get_ranked_phrases()))]), count_matrix)
+        cos = cosine_similarity(count_vectorizer.transform([' '.join(self._find_synonyms(self.r.get_ranked_phrases()))]), count_matrix)[0]
+
+        self.k_means_algorithm(cos, is_user)
 
         return cos
+
+
+    def k_means_algorithm(self, cos: np.ndarray, is_user: bool):
+        """
+        """
+        filter_likes_kwargs = {'user_like': 1} if is_user else {'company_like': 1}
+        filter_dislikes_kwargs = {'user_like': 0} if is_user else {'company_like': 0}
+
+
+        # likes and dislikes for the Companies
+        likes = Match.objects.filter(**filter_likes_kwargs).values('company_id' if is_user else 'user_id') \
+                .annotate(likes=Count('user_like' if is_user else  'company_like'))  \
+                .order_by()
+        dislikes = Match.objects.filter(**filter_dislikes_kwargs).values('company_id' if is_user else 'user_id') \
+                .annotate(likes=Count('user_like' if is_user else  'company_like'))  \
+                .order_by()
+
+        likes_dislikes = {}
+        all = Company.objects.all() if is_user else User.objects.all()
+
+        for entity in all:
+            likes_dislikes[entity.id] = {
+                'likes': 0,
+                'dislikes': 0,
+                'dif': 0 # likes - dislikes
+            }
+
+        # Actualiza el diccionario con los valores de likes y dislikes de las consultas
+        for like in likes:
+            entity_id = like['company_id'] if is_user else like['user_id']
+            likes_dislikes[entity_id]['likes'] = like['likes']
+            likes_dislikes[entity_id]['dif'] = like['likes'] - likes_dislikes[entity_id]['dislikes']
+
+        for dislike in dislikes:
+            entity_id = dislike['company_id'] if is_user else dislike['user_id']
+            likes_dislikes[entity_id]['dislikes'] = dislike['likes']
+            likes_dislikes[entity_id]['dif'] = likes_dislikes[entity_id]['likes'] - dislike['likes']
+
+        preference = np.array([likes_dislikes[entity.id]['dif'] for entity in all])
+
+        # Ponderar la similitud del coseno y la puntuación de preferencia
+        peso_similitud = 0.9  # Peso para la similitud del coseno
+        peso_preferencia = 0.1  # Peso para la puntuación de preferencia
+        puntaje_combinado = (peso_similitud * cos) + (peso_preferencia * preference)
+
+        # Instanciar y ajustar el modelo K-Means personalizado
+        kmeans = KMeans(n_clusters=2, max_iters=100, random_state=42)
+        kmeans.fit(puntaje_combinado.reshape(-1, 1))
+
+        # Identificar el grupo recomendado y el grupo no recomendado
+        grupo_recomendado = np.argmax([puntaje_combinado[kmeans.labels == i].mean() for i in range(kmeans.n_clusters)])
+        grupo_no_recomendado = 1 - grupo_recomendado
+
+        # Obtener índices  recomendadas y no recomendadas
+        recommendations = np.where(kmeans.labels == grupo_recomendado)[0]
+        no_recommendations = np.where(kmeans.labels == grupo_no_recomendado)[0]
+
+        # Ordenar las recomendaciones en función de su puntaje_combinado
+        recommendations = sorted(recommendations, key=lambda idx: puntaje_combinado[idx], reverse=True)
+        no_recommendations = sorted(no_recommendations, key=lambda idx: puntaje_combinado[idx], reverse=True)
+
+        print('Recomendaciones (Grupo Recomendado):')
+        recommendations = []
+        for idx in recommendations:
+            print(f'Recomendacion {idx + 1} - Puntaje Combinado: {puntaje_combinado[idx]}')
+            recommendations.append(puntaje_combinado[idx])
+
+        print('\nRecomendaciones (Grupo No Recomendado):')
+        for idx in no_recommendations:
+            print(f'NO Recomendacion {idx + 1} - Puntaje Combinado: {puntaje_combinado[idx]}')
+            recommendations.append(puntaje_combinado[idx])
+
+        return np.array(recommendations)
 
 
     def fill_bag_of_words(self, df, columns):
@@ -263,7 +340,7 @@ class NlpAlgorithm:
         # Con los que no ha interactuado
         df = df[~df['id'].isin(interacted_matches)]
 
-        cosine_sim_df = pd.DataFrame(cosine_sim[0], columns=['score'])
+        cosine_sim_df = pd.DataFrame(cosine_sim, columns=['score'])
         cosine_sim_df.index += 1
 
         df = df.merge(cosine_sim_df, left_on='id', right_index=True, how='inner')
