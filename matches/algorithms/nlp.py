@@ -67,10 +67,13 @@ class NlpAlgorithm:
             self.keywords_extraction_from_text(df, cols_to_extract)
 
         df['bag_of_words'] = ''
-
         self.fill_bag_of_words(df, cols_to_extract+base_cols)
-        similarities = self.cosine_similarity_algorithm(df, target_str, is_user)
 
+        # Similitud del coseno
+        cos = self.cosine_similarity_algorithm(df, target_str)
+
+        # Similitudes en base a los clusters de K-Means
+        similarities = self.k_means_algorithm(cos, is_user)
         recommended_ids = self.recommend(df, obj, similarities)
 
         return self.sorted_recommendations(is_user, recommended_ids)
@@ -98,7 +101,7 @@ class NlpAlgorithm:
         return recommendations
 
 
-    def cosine_similarity_algorithm(self, df, target_str, is_user: bool):
+    def cosine_similarity_algorithm(self, df, target_str):
         """
         Constructs the vocabulary (set of unique words) using all of the content
         in count.fit_transform() method. Then, a matrix is built by relying on the
@@ -119,19 +122,21 @@ class NlpAlgorithm:
         self.r.extract_keywords_from_text(target_str)
         cos = cosine_similarity(count_vectorizer.transform([' '.join(self._find_synonyms(self.r.get_ranked_phrases()))]), count_matrix)[0]
 
-        self.k_means_algorithm(cos, is_user)
-
         return cos
 
 
     def k_means_algorithm(self, cos: np.ndarray, is_user: bool):
         """
+            Performs K-Means unsupervised machine learning algorithm.
+            Separated the data in 2 clusters (recommended, not recommended) and
+
         """
+        # likes and dislikes for the Companies
+        likes_dislikes = {}
+
         filter_likes_kwargs = {'user_like': 1} if is_user else {'company_like': 1}
         filter_dislikes_kwargs = {'user_like': 0} if is_user else {'company_like': 0}
 
-
-        # likes and dislikes for the Companies
         likes = Match.objects.filter(**filter_likes_kwargs).values('company_id' if is_user else 'user_id') \
                 .annotate(likes=Count('user_like' if is_user else  'company_like'))  \
                 .order_by()
@@ -139,17 +144,17 @@ class NlpAlgorithm:
                 .annotate(likes=Count('user_like' if is_user else  'company_like'))  \
                 .order_by()
 
-        likes_dislikes = {}
+        # all users or companies: likes, dislikes and difference
         all = Company.objects.all() if is_user else User.objects.all()
 
         for entity in all:
             likes_dislikes[entity.id] = {
                 'likes': 0,
                 'dislikes': 0,
-                'dif': 0 # likes - dislikes
+                'dif': 0
             }
 
-        # Actualiza el diccionario con los valores de likes y dislikes de las consultas
+        # Update likes and dislikes for the users or companies
         for like in likes:
             entity_id = like['company_id'] if is_user else like['user_id']
             likes_dislikes[entity_id]['likes'] = like['likes']
@@ -160,39 +165,40 @@ class NlpAlgorithm:
             likes_dislikes[entity_id]['dislikes'] = dislike['likes']
             likes_dislikes[entity_id]['dif'] = likes_dislikes[entity_id]['likes'] - dislike['likes']
 
+        # Numpy array (to be manipulated) with numeric values
         preference = np.array([likes_dislikes[entity.id]['dif'] for entity in all])
 
-        # Ponderar la similitud del coseno y la puntuación de preferencia
-        peso_similitud = 0.9  # Peso para la similitud del coseno
-        peso_preferencia = 0.1  # Peso para la puntuación de preferencia
-        puntaje_combinado = (peso_similitud * cos) + (peso_preferencia * preference)
+        # Cosine similarity & prefence weights (importance from 0 to 1)
+        cos_w = 0.9
+        preference_w = 0.1
+        combined_score = (cos_w * cos) + (preference_w * preference)
 
-        # Instanciar y ajustar el modelo K-Means personalizado
+        # Train & adjust with two clusters using K-Means
         kmeans = KMeans(n_clusters=2, max_iters=100, random_state=42)
-        kmeans.fit(puntaje_combinado.reshape(-1, 1))
+        kmeans.fit(combined_score.reshape(-1, 1))
 
-        # Identificar el grupo recomendado y el grupo no recomendado
-        grupo_recomendado = np.argmax([puntaje_combinado[kmeans.labels == i].mean() for i in range(kmeans.n_clusters)])
-        grupo_no_recomendado = 1 - grupo_recomendado
+        # Identify recommended and NOT recommended groups
+        recommended_group = np.argmax([combined_score[kmeans.labels == i].mean() for i in range(kmeans.n_clusters)])
+        not_recommended_group = 1 - recommended_group
 
-        # Obtener índices  recomendadas y no recomendadas
-        recommendations = np.where(kmeans.labels == grupo_recomendado)[0]
-        no_recommendations = np.where(kmeans.labels == grupo_no_recomendado)[0]
+        # User/Company recommendation indexes (pk)
+        recommendations = np.where(kmeans.labels == recommended_group)[0]
+        no_recommendations = np.where(kmeans.labels == not_recommended_group)[0]
 
-        # Ordenar las recomendaciones en función de su puntaje_combinado
-        recommendations = sorted(recommendations, key=lambda idx: puntaje_combinado[idx], reverse=True)
-        no_recommendations = sorted(no_recommendations, key=lambda idx: puntaje_combinado[idx], reverse=True)
+        # Sort recommendations from high to low
+        # recommendations = sorted(recommendations, key=lambda idx: combined_score[idx], reverse=True)
+        # no_recommendations = sorted(no_recommendations, key=lambda idx: combined_score[idx], reverse=True)
 
         print('Recomendaciones (Grupo Recomendado):')
         recommendations = []
         for idx in recommendations:
-            print(f'Recomendacion {idx + 1} - Puntaje Combinado: {puntaje_combinado[idx]}')
-            recommendations.append(puntaje_combinado[idx])
+            print(f'Recomendacion {idx + 1} - Puntaje Combinado: {combined_score[idx]}')
+            recommendations.append(combined_score[idx])
 
         print('\nRecomendaciones (Grupo No Recomendado):')
         for idx in no_recommendations:
-            print(f'NO Recomendacion {idx + 1} - Puntaje Combinado: {puntaje_combinado[idx]}')
-            recommendations.append(puntaje_combinado[idx])
+            print(f'NO Recomendacion {idx + 1} - Puntaje Combinado: {combined_score[idx]}')
+            recommendations.append(combined_score[idx])
 
         return np.array(recommendations)
 
@@ -318,12 +324,12 @@ class NlpAlgorithm:
         return df
 
 
-    def recommend(self, df, obj, cosine_sim):
+    def recommend(self, df, obj, similarities):
         """
         Args:
             df (pandas.DataFrame): A DataFrame containing user or company profiles
             obj (User or Company): The user or company object for which recommendations are generated
-            cosine_sim (numpy.ndarray): A cosine similarity matrix representing user or company interactions
+            cosine_sim (numpy.ndarray): A similarity vector representing user or company interactions
 
         Returns:
             recommendations (list): A list of recommended user or company profiles
@@ -340,10 +346,10 @@ class NlpAlgorithm:
         # Con los que no ha interactuado
         df = df[~df['id'].isin(interacted_matches)]
 
-        cosine_sim_df = pd.DataFrame(cosine_sim, columns=['score'])
-        cosine_sim_df.index += 1
+        similarity_df = pd.DataFrame(similarities, columns=['score'])
+        similarity_df.index += 1
 
-        df = df.merge(cosine_sim_df, left_on='id', right_index=True, how='inner')
+        df = df.merge(similarity_df, left_on='id', right_index=True, how='inner')
         df = df[df['score'] > 0]
         df = df.sort_values(by='score', ascending=False)
         # df.to_csv('final_results.csv')
