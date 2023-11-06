@@ -9,10 +9,10 @@ from roles.models import Role
 
 # Create your models here.
 class Experience(models.Model):
-    start_date = models.DateField(validators=[
+    end_date = models.DateField(validators=[
         MaxValueValidator(limit_value=date.today()),
     ])
-    end_date = models.DateField(validators=[
+    start_date = models.DateField(validators=[
         MaxValueValidator(limit_value=date.today())
     ])
     description = models.TextField(validators=[

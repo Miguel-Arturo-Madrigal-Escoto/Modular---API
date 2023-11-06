@@ -58,9 +58,8 @@ class User(models.Model):
 
 
 class Company(models.Model):
-    name = models.CharField(max_length=50, validators=[
-        MinLengthValidator(3),
-        MaxLengthValidator(50),
+    name = models.CharField(validators=[
+        MinLengthValidator(3)
     ])
     about = models.TextField(validators=[
         MinLengthValidator(20)
@@ -72,7 +71,7 @@ class Company(models.Model):
         MinLengthValidator(20)
     ])
     verified = models.BooleanField(default=False)
-    location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
+    location = models.CharField(choices=LOCATION_CHOICES)
     sector = models.ForeignKey('sectors.Sector', on_delete=models.CASCADE)
     image = CloudinaryField('images/company', null=True, blank=True)
     base_user = models.OneToOneField(

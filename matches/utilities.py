@@ -1,3 +1,4 @@
+import requests
 from django.db.models import Q
 
 from authentication.models import Company, User
@@ -21,3 +22,10 @@ class AlterMatchLikes:
             Remove the dislike from the user if my role is 'company'.
         """
         Match.objects.filter(Q(user_like=False) | Q(user_like__isnull=True), company=company).update(user_like=None)
+
+
+def download_image(url, local_filename = './form/downloaded_pic.jpg'):
+    response = requests.get(url, stream=True)
+    with open(local_filename, 'wb') as file:
+        for chunk in response.iter_content(chunk_size=8192):
+            file.write(chunk)

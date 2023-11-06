@@ -14,9 +14,8 @@ class Role(models.Model):
 
 
 class CompanyRoles(models.Model):
-    name = models.CharField(max_length=40, validators=[
-        MinLengthValidator(5),
-        MaxLengthValidator(40)
+    name = models.CharField(validators=[
+        MinLengthValidator(5)
     ])
     description = models.TextField(validators=[
         MinLengthValidator(20),
