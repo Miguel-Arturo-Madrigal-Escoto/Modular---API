@@ -164,7 +164,7 @@ WSGI_APPLICATION = 'modularAPI.wsgi.application'
 # }
 
 # MongoDB
-# connect(host=os.environ.get('MONGO_DATABASE_URL', ''))
+connect(host=os.environ.get('MONGO_DATABASE_URL', ''))
 
 # PostgreSQL DB
 DATABASES = {

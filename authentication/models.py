@@ -92,7 +92,7 @@ class MongoUser(Document):
     """
     base_user = IntField(min_value=1)
     name = StringField()
-    email = EmailField()
+    email = StringField()
     role = EnumField(MongoUserRoleEnum, choices=[MongoUserRoleEnum.USER, MongoUserRoleEnum.COMPANY])
     online = BooleanField(default=False)
     createdAt = DateTimeField(default=datetime.datetime.now())

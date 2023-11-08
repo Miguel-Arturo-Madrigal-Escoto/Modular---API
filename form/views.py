@@ -12,7 +12,7 @@ from rest_framework.viewsets import ViewSet
 from unidecode import unidecode
 
 from authentication.constants import LOCATION_CHOICES, MODALITY_CHOICES
-from authentication.models import BaseUser, Company, User
+from authentication.models import BaseUser, Company, User, MongoUser
 from experience.models import Experience
 from matches.utilities import download_image
 from roles.models import CompanyRoles, Role
@@ -227,3 +227,30 @@ class CompanySeedViewSet(ViewSet):
             return Response({ 'ok': 'db seeded' })
         except Exception as e:
             return Response({ 'ok': f'{e}' })
+
+class SeedMongoChat(ViewSet):
+
+    def list(self, request):
+        # Seed users
+        users = User.objects.all()
+        for user in users:
+            mu = MongoUser(
+                base_user=user.base_user_id,
+                name=f'{ user.name } { user.lastname }',
+                email=user.base_user.email,
+                role='user'
+            )
+            mu.save()
+
+        # Seed companies
+        companies = Company.objects.all()
+        for company in companies:
+            mu = MongoUser(
+                base_user=company.base_user_id,
+                name=company.name,
+                email=company.base_user.email,
+                role='company'
+            )
+            mu.save()
+    
+        return Response({ 'ok': 'Mongo DB Seeded' })
