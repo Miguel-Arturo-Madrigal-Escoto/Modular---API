@@ -156,30 +156,30 @@ WSGI_APPLICATION = 'modularAPI.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # SQLite DB
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # MongoDB
 # connect(host=os.environ.get('MONGO_DATABASE_URL', ''))
 
 # PostgreSQL DB
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DB_NAME'),
-#         'USER': os.environ.get('DB_USER'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD'),
-#         'PORT': os.environ.get('DB_PORT'),
-#         'HOST': os.environ.get('DB_HOST'),
-#         'OPTIONS': {
-#             'sslmode': os.environ.get('SSLMODE', 'disable')
-#         },
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'PORT': os.environ.get('DB_PORT'),
+        'HOST': os.environ.get('DB_HOST'),
+        'OPTIONS': {
+            'sslmode': os.environ.get('SSLMODE', 'disable')
+        },
+    }
+}
 
 # Cloudinary configuration
 cloudinary.config(
@@ -272,3 +272,4 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if DEBUG == 0 else
 SECURE_SSL_REDIRECT = DEBUG == 0
 SESSION_COOKIE_SECURE = DEBUG == 0
 CSRF_COOKIE_SECURE = DEBUG == 0
+CORS_REPLACE_HTTPS_REFERER = DEBUG == 0

@@ -1,5 +1,5 @@
 import warnings
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 import nltk
 import numpy as np
@@ -52,8 +52,8 @@ class NlpAlgorithm:
         base_cols = []
 
         if is_user:
-            cols_to_extract = ['new_mission', 'new_vision', 'new_about', 'new_roles']
-            base_cols = ['location', 'bag_of_words']
+            cols_to_extract = ['new_about', 'new_roles']
+            base_cols = ['bag_of_words']
             self.add_company_data_to_df(df)
             for col in cols_to_extract:
                 df[col] = ''
@@ -74,6 +74,7 @@ class NlpAlgorithm:
 
         # Similitudes en base a los clusters de K-Means
         similarities = self.k_means_algorithm(cos, is_user)
+
         recommended_ids = self.recommend(df, obj, similarities)
 
         return self.sorted_recommendations(is_user, recommended_ids)
@@ -119,13 +120,21 @@ class NlpAlgorithm:
         count_vectorizer = CountVectorizer(lowercase=True)
         count_matrix = count_vectorizer.fit_transform(df['bag_of_words'])
 
+        # Calcula la similitud del coseno entre el texto de destino y el conjunto de documentos
         self.r.extract_keywords_from_text(target_str)
-        cos = cosine_similarity(count_vectorizer.transform([' '.join(self._find_synonyms(self.r.get_ranked_phrases()))]), count_matrix)[0]
+        cosine_similarities = cosine_similarity(count_vectorizer.transform([' '.join(self._find_synonyms(self.r.get_ranked_phrases()))]), count_matrix)[0]
 
-        return cos
+        # Asocia los valores de similitud del coseno con los IDs en el DataFrame
+        similarity_dict = {}
+        for idx, cos_similarity in enumerate(cosine_similarities):
+            # obj_id : user_id | company_id
+            obj_id = df.at[idx, 'id']  # Obtén el ID correspondiente a la fila actual en el DataFrame
+            similarity_dict[obj_id] = cos_similarity
+
+        return similarity_dict
 
 
-    def k_means_algorithm(self, cos: np.ndarray, is_user: bool):
+    def k_means_algorithm(self, cos: dict, is_user: bool):
         """
             Performs K-Means unsupervised machine learning algorithm.
             Separated the data in 2 clusters (recommended, not recommended) and
@@ -168,39 +177,34 @@ class NlpAlgorithm:
         # Numpy array (to be manipulated) with numeric values
         preference = np.array([likes_dislikes[entity.id]['dif'] for entity in all])
 
-        # Cosine similarity & prefence weights (importance from 0 to 1)
+        # Convert similarity_dict values to numpy array
+        similarity_scores = np.array(list(cos.values()))
+
+        # Cosine similarity & preference weights (importance from 0 to 1)
         cos_w = 0.9
         preference_w = 0.1
-        combined_score = (cos_w * cos) + (preference_w * preference)
+
+        # Combined score calculation
+        combined_score = (cos_w * similarity_scores) + (preference_w * preference)
 
         # Train & adjust with two clusters using K-Means
-        kmeans = KMeans(n_clusters=2, max_iters=100, random_state=42)
+        kmeans = KMeans(n_clusters=2, max_iters=50, random_state=42)
         kmeans.fit(combined_score.reshape(-1, 1))
 
-        # Identify recommended and NOT recommended groups
+        # Identify recommended group
         recommended_group = np.argmax([combined_score[kmeans.labels == i].mean() for i in range(kmeans.n_clusters)])
-        not_recommended_group = 1 - recommended_group
 
         # User/Company recommendation indexes (pk)
         recommendations = np.where(kmeans.labels == recommended_group)[0]
-        no_recommendations = np.where(kmeans.labels == not_recommended_group)[0]
 
-        # Sort recommendations from high to low
-        # recommendations = sorted(recommendations, key=lambda idx: combined_score[idx], reverse=True)
-        # no_recommendations = sorted(no_recommendations, key=lambda idx: combined_score[idx], reverse=True)
-
-        print('Recomendaciones (Grupo Recomendado):')
-        recommendations = []
+        recommendation_dict = {}
         for idx in recommendations:
-            print(f'Recomendacion {idx + 1} - Puntaje Combinado: {combined_score[idx]}')
-            recommendations.append(combined_score[idx])
+            empresa_id = list(cos.keys())[idx]  # Obtén el empresa_id correspondiente al índice
+            score = combined_score[idx]
+            recommendation_dict[empresa_id] = score
+            #print(f'Recomendacion {empresa_id} - Puntaje Combinado: {score}')
 
-        print('\nRecomendaciones (Grupo No Recomendado):')
-        for idx in no_recommendations:
-            print(f'NO Recomendacion {idx + 1} - Puntaje Combinado: {combined_score[idx]}')
-            recommendations.append(combined_score[idx])
-
-        return np.array(recommendations)
+        return recommendation_dict
 
 
     def fill_bag_of_words(self, df, columns):
@@ -276,26 +280,14 @@ class NlpAlgorithm:
         Returns:
             None.
         """
-        all_skills = {}
-        for user in Skill.objects.all():
-            all_skills[user.id] = ''
-        for skill in Skill.objects.all():
-            string = f'{ skill.name } { skill.description}'
-            all_skills[skill.user_id] = all_skills.get(skill.user_id, '') + string
+        all_skills = {skill['user_id']: f'{skill["name"]} {skill["description"]}' for skill in Skill.objects.all().values('user_id', 'name', 'description')}
+        all_experiences = {experience['user_id']: f'{experience["description"]} {experience["role__position"]}' for experience in Experience.objects.all().values('user_id', 'description', 'role__position')}
 
-        all_experiences = {}
-        for user in Experience.objects.all():
-            all_experiences[user.id] = ''
-        for experience in Experience.objects.all():
-            string = f'{ experience.description } { experience.role.position  }'
-            all_experiences[experience.user_id] = all_experiences.get(experience.user_id, '') + string
+        if 'skills' not in df.columns: df['skills'] = ''
+        if 'experiences' not in df.columns: df['experiences'] = ''
 
-        all_skills = OrderedDict(sorted(all_skills.items()))
-        all_experiences = OrderedDict(sorted(all_experiences.items()))
-        for i, user in enumerate(User.objects.all()):
-            df.at[i, 'skills'] = all_skills.get(i+1, '')
-            df.at[i, 'experiences'] = all_experiences.get(i+1, '')
-
+        df['skills'] = df['id'].map(lambda user_id: all_skills.get(user_id, ''))
+        df['experiences'] = df['id'].map(lambda user_id: all_experiences.get(user_id, ''))
 
 
     def add_company_data_to_df(self, df):
@@ -309,19 +301,11 @@ class NlpAlgorithm:
         Returns:
             df (pd.DataFrame): The updated DataFrame with roles column.
         """
+        all_roles = {role['company_id']: f'{role["name"]} {role["description"]} {role["role__position"]}' for role in CompanyRoles.objects.all().values('company_id', 'name', 'description', 'role__position')}
 
-        all_roles = {}
-        for company in Company.objects.all():
-            all_roles[company.id] = ''
-        for role in CompanyRoles.objects.all():
-            string = f'{ role.name } { role.description } { role.role.position }'
-            all_roles[role.company_id] = all_roles.get(role.company_id, '') + string
+        if 'roles' not in df.columns: df['roles'] = ''
 
-        all_roles = OrderedDict(sorted(all_roles.items()))
-        for i, company in enumerate(Company.objects.all()):
-            df.at[i, 'roles'] = all_roles.get(i+1, '')
-
-        return df
+        df['roles'] = df['id'].map(lambda company_id: all_roles.get(company_id, ''))
 
 
     def recommend(self, df, obj, similarities):
@@ -346,16 +330,14 @@ class NlpAlgorithm:
         # Con los que no ha interactuado
         df = df[~df['id'].isin(interacted_matches)]
 
-        similarity_df = pd.DataFrame(similarities, columns=['score'])
-        similarity_df.index += 1
+        similarity_df = pd.DataFrame(list(similarities.items()), columns=['id', 'score'])
 
-        df = df.merge(similarity_df, left_on='id', right_index=True, how='inner')
+        df = df.merge(similarity_df, on='id', how='left')
         df = df[df['score'] > 0]
         df = df.sort_values(by='score', ascending=False)
-        # df.to_csv('final_results.csv')
-        # print(df)
+
         if df.empty:
             return []
         recommendations = df['id'].values.tolist()
 
-        return recommendations
+        return recommendations[:10]
