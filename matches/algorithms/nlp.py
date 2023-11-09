@@ -193,12 +193,19 @@ class NlpAlgorithm:
 
         # Identify recommended group
         recommended_group = np.argmax([combined_score[kmeans.labels == i].mean() for i in range(kmeans.n_clusters)])
+        not_recommended_group = 1 - recommended_group
 
         # User/Company recommendation indexes (pk)
         recommendations = np.where(kmeans.labels == recommended_group)[0]
+        no_recommendations = np.where(kmeans.labels == not_recommended_group)[0]
 
         recommendation_dict = {}
         for idx in recommendations:
+            empresa_id = list(cos.keys())[idx]  # Obtén el empresa_id correspondiente al índice
+            score = combined_score[idx]
+            recommendation_dict[empresa_id] = score
+
+        for idx in no_recommendations:
             empresa_id = list(cos.keys())[idx]  # Obtén el empresa_id correspondiente al índice
             score = combined_score[idx]
             recommendation_dict[empresa_id] = score
