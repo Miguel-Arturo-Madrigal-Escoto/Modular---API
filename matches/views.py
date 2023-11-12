@@ -91,11 +91,11 @@ class MatchViewSet(ModelViewSet):
         experiences = Experience.objects.filter(user_id=request.user.user.id)
         for experience in experiences:
             string_to_match += f'{ experience.description } '
-            string_to_match += f'{ experience.role.position } '
+            string_to_match += f'{ experience.role.position } '*60
 
         skills = Skill.objects.filter(user_id=request.user.user.id)
         for skill in skills:
-            string_to_match += f'{ skill.name } '
+            string_to_match += f'{ skill.name } '*30
             string_to_match += f'{ skill.description } '
 
         nlp = NlpAlgorithm()
@@ -115,9 +115,9 @@ class MatchViewSet(ModelViewSet):
         roles = CompanyRoles.objects.filter(company_id=request.user.company.id)
 
         for rol in roles:
-            string_to_match += f'{ rol.name } '
+            string_to_match += f'{ rol.name } '*30
             string_to_match += f'{ rol.description } '
-            string_to_match += f'{ rol.role.position } '
+            string_to_match += f'{ rol.role.position } '*60
 
         nlp = NlpAlgorithm()
         users = nlp.generateNLPRecommendations(request.user.company, string_to_match)

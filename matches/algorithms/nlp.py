@@ -209,7 +209,6 @@ class NlpAlgorithm:
             empresa_id = list(cos.keys())[idx]  # Obtén el empresa_id correspondiente al índice
             score = combined_score[idx]
             recommendation_dict[empresa_id] = score
-            #print(f'Recomendacion {empresa_id} - Puntaje Combinado: {score}')
 
         return recommendation_dict
 
@@ -287,8 +286,8 @@ class NlpAlgorithm:
         Returns:
             None.
         """
-        all_skills = {skill['user_id']: f'{skill["name"]} {skill["description"]}' for skill in Skill.objects.all().values('user_id', 'name', 'description')}
-        all_experiences = {experience['user_id']: f'{experience["description"]} {experience["role__position"]}' for experience in Experience.objects.all().values('user_id', 'description', 'role__position')}
+        all_skills = {skill['user_id']: f'{(skill["name"] + " ")*30} {skill["description"]}' for skill in Skill.objects.all().values('user_id', 'name', 'description')}
+        all_experiences = {experience['user_id']: f'{experience["description"]} {(experience["role__position"]+ " ")*60}' for experience in Experience.objects.all().values('user_id', 'description', 'role__position')}
 
         if 'skills' not in df.columns: df['skills'] = ''
         if 'experiences' not in df.columns: df['experiences'] = ''
@@ -308,7 +307,7 @@ class NlpAlgorithm:
         Returns:
             df (pd.DataFrame): The updated DataFrame with roles column.
         """
-        all_roles = {role['company_id']: f'{role["name"]} {role["description"]} {role["role__position"]}' for role in CompanyRoles.objects.all().values('company_id', 'name', 'description', 'role__position')}
+        all_roles = {role['company_id']: f'{(role["name"] + " ")*30} {role["description"][:]} {(role["role__position"] + " ")*60}' for role in CompanyRoles.objects.all().values('company_id', 'name', 'description', 'role__position')}
 
         if 'roles' not in df.columns: df['roles'] = ''
 
