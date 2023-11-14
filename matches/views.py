@@ -82,10 +82,10 @@ class MatchViewSet(ModelViewSet):
     @action(methods=['GET'], detail=False)
     def get_user_match(self, request: Request):
         string_to_match = ''
-        string_to_match += f'{ request.user.user.position.position } '
+        string_to_match += f'{ request.user.user.position.position } '*20
         string_to_match += f'{ request.user.user.expected_salary } '
-        string_to_match += f'{ request.user.user.modality } '
-        string_to_match += f'{ request.user.user.location } '
+        string_to_match += f'{ request.user.user.modality } '*20
+        string_to_match += f'{ request.user.user.location } '*20
         string_to_match += f'{ request.user.user.about } '
 
         experiences = Experience.objects.filter(user_id=request.user.user.id)
@@ -109,8 +109,8 @@ class MatchViewSet(ModelViewSet):
         string_to_match += f'{ request.user.company.about } '
         string_to_match += f'{ request.user.company.mission } '
         string_to_match += f'{ request.user.company.vision } '
-        string_to_match += f'{ request.user.company.location } '
-        string_to_match += f'{ request.user.company.sector.name } '
+        string_to_match += f'{ request.user.company.location } '*20
+        string_to_match += f'{ request.user.company.sector.name } '*20
 
         roles = CompanyRoles.objects.filter(company_id=request.user.company.id)
 
